@@ -304,20 +304,37 @@ document.getElementById('chat-input').addEventListener('keydown', e => {
 });
 
 async function sendChat() {
-  const k = sel();
-  if (!k) { toast('Velg deg selv i nedtrekksmenyen først.', 'e'); return; }
   const inp = document.getElementById('chat-input');
   const text = inp.value.trim();
   if (!text) return;
+
+  const k = sel();
+  if (!k) {
+    toast('⚠ Velg deg selv i nedtrekksmenyen før du sender!', 'e');
+    return;
+  }
   const u = state.users[k];
-  if (!u) return;
+  if (!u) { toast('Finner ikke brukeren din.', 'e'); return; }
+
   inp.value = '';
-  await push(ref(db, 'chat'), {
-    name: u.displayName,
-    userKey: k,
-    text,
-    ts: Date.now()
-  });
+  inp.disabled = true;
+  document.getElementById('btn-send').disabled = true;
+
+  try {
+    await push(ref(db, 'chat'), {
+      name: u.displayName,
+      userKey: k,
+      text,
+      ts: Date.now()
+    });
+  } catch(e) {
+    toast('Kunne ikke sende: ' + e.message, 'e');
+    inp.value = text;
+  } finally {
+    inp.disabled = false;
+    document.getElementById('btn-send').disabled = false;
+    inp.focus();
+  }
 }
 
 // ── Helpers ─────────────────────────────────────────────────
