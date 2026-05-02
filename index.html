@@ -90,6 +90,8 @@
   .lb-time { font-family: 'Space Mono', monospace; font-size: 15px; color: var(--accent); font-weight: 700; }
   .lb-right { text-align: right; }
 
+  .status-text { font-size: 11px; color: var(--muted2); font-style: italic; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+  .status-badge { display: inline-block; background: rgba(232,255,71,0.08); border: 1px solid rgba(232,255,71,0.2); border-radius: 6px; padding: 3px 10px; font-size: 11px; color: var(--accent); font-family: 'Space Mono', monospace; margin-top: 6px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .penalty-note { background: rgba(255,71,120,0.08); border: 1px solid rgba(255,71,120,0.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--accent3); font-family: 'Space Mono', monospace; margin-top: 16px; line-height: 1.6; }
   .pulse-dot { display: inline-block; width: 7px; height: 7px; background: var(--accent2); border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
   .empty { text-align: center; padding: 28px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 12px; line-height: 1.8; }
@@ -113,8 +115,8 @@
   <header>
     <div class="header-inner">
       <div>
-        <div class="logo">// MORTENSINE</div>
-        <h1>Hvem <span>er</span> <span>på</span> skolen?</h1>
+        <div class="logo">// Study Tracker</div>
+        <h1>Who <span>Grinds</span> Hardest?</h1>
       </div>
       <div>
         <div class="clock-display" id="live-clock">00:00:00</div>
@@ -144,6 +146,10 @@
         <select id="user-sel"><option value="">— Velg deg selv —</option></select>
         <button class="btn-cyan" id="btn-in" onclick="arrive()" disabled>Ankomst 🏫</button>
         <button class="btn-red" id="btn-out" onclick="leave()" disabled>Avreise 🚪</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <input type="text" id="status-input" placeholder="Skriv en status... (f.eks. 'Pugger matte 📚')" maxlength="60">
+        <button class="btn-yellow" onclick="setStatus()">Sett status</button>
       </div>
       <div class="penalty-note">⚠ Overnatting-straff: glemmer du å sjekke ut og midnatt passerer, annulleres økten og 30 minutter trekkes fra totalen din.</div>
     </div>
@@ -285,6 +291,15 @@ window.leave = async function() {
   toast(`${u.displayName} sjekket ut — økt: ${dur(ms)} 🚪`, 'i');
 };
 
+window.setStatus = async function() {
+  const k = sel();
+  if (!k) { toast('Velg deg selv først.', 'e'); return; }
+  const status = document.getElementById('status-input').value.trim();
+  await update(ref(db), { [`studytrack/users/${k}/status`]: status || null });
+  document.getElementById('status-input').value = '';
+  toast(status ? `Status satt: "${status}"` : 'Status fjernet.', 'i');
+};
+
 function sel() { return document.getElementById('user-sel').value || null; }
 document.getElementById('user-sel').addEventListener('change', updateBtns);
 
@@ -320,7 +335,7 @@ function renderPresent() {
   const el = document.getElementById('present-now');
   const here = Object.values(state.users||{}).filter(u => u.active);
   el.innerHTML = here.length
-    ? here.map(u => `<span class="tag"><span class="pulse-dot"></span>${esc(u.displayName)}</span>`).join('')
+    ? here.map(u => `<span class="tag"><span class="pulse-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('')
     : '<span class="muted">Ingen er på skolen akkurat nå.</span>';
 }
 
@@ -342,7 +357,8 @@ function renderLive() {
     <div class="live-card">
       <div class="live-name">${esc(u.displayName)}</div>
       <div class="live-since">Siden ${fmtT(u.active)}</div>
-      <div class="live-dur">${dur(Date.now() - u.active)}</div>
+      ${u.status ? `<div class="status-badge">💬 ${esc(u.status)}</div>` : ''}
+      <div class="live-dur" style="margin-top:10px">${dur(Date.now() - u.active)}</div>
     </div>`).join('');
 }
 
