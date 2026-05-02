@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudyTrack — Who Grinds Hardest?</title>
+<title>MORTENSINE — Hvem er på skolen?</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f; --surface: #111118; --surface2: #1a1a24; --border: #2a2a3a;
-    --accent: #e8ff47; --accent2: #47ffe8; --accent3: #ff4778;
-    --text: #f0f0f8; --muted2: #606078;
+    --bg: #ffffff; --surface: #ffffff; --surface2: #f5f5f5; --border: #e0e0e0;
+    --accent: #111111; --accent2: #0aa; --accent3: #d33;
+    --text: #111111; --muted2: #777777;
     --gold: #ffd700; --silver: #c0c0d0; --bronze: #cd7f32;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,7 +56,7 @@
   button { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.06em; border: none; border-radius: 8px; padding: 12px 20px; cursor: pointer; text-transform: uppercase; transition: transform 0.1s, box-shadow 0.2s; white-space: nowrap; }
   button:active { transform: scale(0.97); }
   button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-  .btn-yellow { background: var(--accent); color: #0a0a0f; }
+  .btn-yellow { background: var(--accent); color: #ffffff; }
   .btn-yellow:not(:disabled):hover { box-shadow: 0 0 20px rgba(232,255,71,0.3); }
   .btn-cyan { background: var(--accent2); color: #0a0a0f; }
   .btn-cyan:not(:disabled):hover { box-shadow: 0 0 20px rgba(71,255,232,0.3); }
@@ -146,8 +146,8 @@
   <header>
     <div class="header-inner">
       <div>
-        <div class="logo">// Study Tracker</div>
-        <h1>Who <span>Grinds</span> Hardest?</h1>
+        <div class="logo">// MORTENSINE</div>
+        <h1>Hvem <span>er</span> <span>på</span> skolen?</h1>
       </div>
       <div>
         <div class="clock-display" id="live-clock">00:00:00</div>
@@ -589,7 +589,7 @@ setInterval(() => {
   document.getElementById('live-date').textContent =
     now.toLocaleDateString('nb-NO', { weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
   if (db) { renderLive(); renderAllLBs(); }
-}, 1000);
+}, 10000);
 
 // ── Utils ────────────────────────────────────────────────────
 function key(n) { return n.toLowerCase().replace(/[^a-z0-9æøå]/g, '_').slice(0, 40); }
