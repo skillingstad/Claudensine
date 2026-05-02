@@ -250,7 +250,7 @@
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue, update, set, push, query, limitToLast }
+import { getDatabase, ref, onValue, update, set, push }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 // ── Config ─────────────────────────────────────────────────
@@ -290,11 +290,14 @@ function listen() {
     render();
   }, e => { setConn('Tilkoblingsfeil', 'err'); toast('Firebase: ' + e.message, 'e'); });
 
-  onValue(query(ref(db, 'chat'), limitToLast(200)), snap => {
-    console.log('[chat-listener] triggered, snap exists:', snap.exists(), 'size:', snap.size);
+  onValue(ref(db, 'chat'), snap => {
     chatMessages = [];
-    snap.forEach(child => chatMessages.push({ id: child.key, ...child.val() }));
-    console.log('[chat-listener] messages loaded:', chatMessages.length);
+    if (snap.exists()) {
+      const all = [];
+      snap.forEach(child => all.push({ id: child.key, ...child.val() }));
+      // Keep only last 200
+      chatMessages = all.slice(-200);
+    }
     renderChat();
   }, e => {
     console.error('[chat-listener] ERROR:', e.message, e.code);
