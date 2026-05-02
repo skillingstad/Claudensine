@@ -384,7 +384,7 @@ setInterval(() => {
     now.toLocaleDateString('nb-NO', { weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
   renderLive();
   renderLB();
-}, 1000);
+}, 10000);
 
 // ── Utils ──────────────────────────────────────────────────
 function key(n) { return n.toLowerCase().replace(/[^a-z0-9æøå]/g, '_').slice(0, 40); }
