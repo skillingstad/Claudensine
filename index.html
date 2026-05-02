@@ -8,7 +8,7 @@
 <style>
   :root {
     --bg: #ffffff; --surface: #ffffff; --surface2: #f5f5f5; --border: #e0e0e0;
-    --accent: #111111; --accent2: #87ae73; --accent3: #ff4778;
+    --accent: #111111; --accent2: #0aa; --accent3: #d33;
     --text: #111111; --muted2: #777777;
     --gold: #ffd700; --silver: #c0c0d0; --bronze: #cd7f32;
   }
@@ -51,7 +51,7 @@
   button:disabled { opacity: 0.35; cursor: not-allowed; }
   .btn-yellow { background: var(--accent); color: #ffffff; }
   .btn-yellow:not(:disabled):hover { box-shadow: 0 0 20px rgba(232,255,71,0.3); }
-  .btn-cyan { background: var(--accent2); color: #0a0a0f; }
+  .btn-cyan { background: var(--accent2); color: #ffffff; }
   .btn-cyan:not(:disabled):hover { box-shadow: 0 0 20px rgba(71,255,232,0.3); }
   .btn-red { background: var(--accent3); color: #fff; }
   .btn-red:not(:disabled):hover { box-shadow: 0 0 20px rgba(255,71,120,0.3); }
@@ -109,6 +109,18 @@
   .chat-input-row { display: flex; gap: 10px; }
   .chat-input-row input { flex: 1; }
   .chat-empty { text-align: center; padding: 24px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 11px; }
+
+  /* ADMIN */
+  .admin-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .admin-name { flex: 1; font-weight: 700; min-width: 100px; }
+  .admin-name input { background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; padding: 2px 4px; outline: none; width: 100%; transition: border-color 0.2s; }
+  .admin-name input:focus { border-bottom-color: var(--accent); }
+  .btn-sm { padding: 7px 14px; font-size: 11px; border-radius: 6px; }
+  .btn-save { background: var(--accent2); color: #0a0a0f; }
+  .btn-save:hover { box-shadow: 0 0 12px rgba(71,255,232,0.3); }
+  .btn-delete { background: rgba(255,71,120,0.15); color: var(--accent3); border: 1px solid rgba(255,71,120,0.3); }
+  .btn-delete:hover { background: rgba(255,71,120,0.25); }
+  .admin-stats { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); white-space: nowrap; }
 
   .penalty-note { background: rgba(255,71,120,0.08); border: 1px solid rgba(255,71,120,0.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--accent3); font-family: 'Space Mono', monospace; margin-top: 16px; line-height: 1.6; }
   .pulse-dot { display: inline-block; width: 7px; height: 7px; background: var(--accent2); border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
@@ -202,6 +214,11 @@
         <input type="text" id="chat-input" placeholder="Skriv en melding..." maxlength="200" onkeydown="if(event.key==='Enter')sendChat()">
         <button class="btn-cyan" onclick="sendChat()">Send</button>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚙ Administrer brukere</div>
+      <div id="admin-list"></div>
     </div>
 
   </div>
@@ -355,7 +372,7 @@ document.getElementById('user-sel').addEventListener('change', updateBtns);
 
 // ── Render ─────────────────────────────────────────────────
 function render() {
-  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderLB();
+  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderLB(); renderAdmin();
 }
 
 function renderSel() {
@@ -465,6 +482,37 @@ function renderChat(msgs) {
 
   if (wasAtBottom) el.scrollTop = el.scrollHeight;
 }
+
+function renderAdmin() {
+  const el = document.getElementById('admin-list');
+  const users = Object.entries(state.users||{});
+  if (!users.length) { el.innerHTML = '<div class="empty" style="padding:16px">Ingen brukere ennå.</div>'; return; }
+  el.innerHTML = users
+    .sort((a,b) => (a[1].displayName||'').localeCompare(b[1].displayName||''))
+    .map(([k, u]) => `
+      <div class="admin-row">
+        <div class="admin-name">
+          <input type="text" id="admin-inp-${k}" value="${esc(u.displayName)}" maxlength="30">
+        </div>
+        <div class="admin-stats">${dur((u.totalMs||0)-(u.penalty||0))} totalt${u.active ? ' 🟢' : ''}</div>
+        <button class="btn-sm btn-save" onclick="renameUser('${k}')">Lagre</button>
+        <button class="btn-sm btn-delete" onclick="deleteUser('${k}', '${esc(u.displayName)}')">Slett</button>
+      </div>`).join('');
+}
+
+window.renameUser = async function(k) {
+  const inp = document.getElementById('admin-inp-' + k);
+  const newName = inp.value.trim();
+  if (!newName) { toast('Navn kan ikke være tomt.', 'e'); return; }
+  await update(ref(db), { [`studytrack/users/${k}/displayName`]: newName });
+  toast(`Navn oppdatert til "${newName}" ✅`, 'i');
+};
+
+window.deleteUser = async function(k, displayName) {
+  if (!confirm(`Er du sikker på at du vil slette "${displayName}"? All data deres forsvinner.`)) return;
+  await set(ref(db, `studytrack/users/${k}`), null);
+  toast(`"${displayName}" er slettet.`, 'e');
+};
 
 // ── Tick every second ──────────────────────────────────────
 setInterval(() => {
