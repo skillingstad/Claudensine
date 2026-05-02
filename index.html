@@ -290,10 +290,15 @@ function listen() {
     render();
   }, e => { setConn('Tilkoblingsfeil', 'err'); toast('Firebase: ' + e.message, 'e'); });
 
-  onValue(query(ref(db, 'chat'), limitToLast(100)), snap => {
+  onValue(query(ref(db, 'chat'), limitToLast(200)), snap => {
+    console.log('[chat-listener] triggered, snap exists:', snap.exists(), 'size:', snap.size);
     chatMessages = [];
     snap.forEach(child => chatMessages.push({ id: child.key, ...child.val() }));
+    console.log('[chat-listener] messages loaded:', chatMessages.length);
     renderChat();
+  }, e => {
+    console.error('[chat-listener] ERROR:', e.message, e.code);
+    toast('Chat-feil: ' + e.message, 'e');
   });
 }
 
