@@ -291,14 +291,16 @@ function listen() {
   }, e => { setConn('Tilkoblingsfeil', 'err'); toast('Firebase: ' + e.message, 'e'); });
 
   onValue(ref(db, 'chat'), snap => {
+    console.log('[chat-listener] FIRED. exists:', snap.exists());
     chatMessages = [];
     if (snap.exists()) {
       const all = [];
       snap.forEach(child => all.push({ id: child.key, ...child.val() }));
-      // Keep only last 200
       chatMessages = all.slice(-200);
+      console.log('[chat-listener] loaded', chatMessages.length, 'messages');
     }
     renderChat();
+    console.log('[chat-listener] renderChat done, el children:', document.getElementById('chat-messages').children.length);
   }, e => {
     console.error('[chat-listener] ERROR:', e.message, e.code);
     toast('Chat-feil: ' + e.message, 'e');
