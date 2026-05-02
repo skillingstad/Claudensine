@@ -177,11 +177,11 @@
       <div class="card-title">Sjekk inn / ut</div>
       <div class="row">
         <select id="user-sel"><option value="">— Velg deg selv —</option></select>
-        <button class="btn-cyan" id="btn-in" onclick="arrive()" disabled>Ankomst 🏫</button>
-        <button class="btn-red" id="btn-out" onclick="leave()" disabled>Avreise 🚪</button>
+        <button class="btn-cyan" id="btn-in" onclick="arrive()" disabled>Locked in</button>
+        <button class="btn-red" id="btn-out" onclick="leave()" disabled>Locked out</button>
       </div>
       <div class="row" style="margin-top:12px">
-        <input type="text" id="status-input" placeholder="Sett en status... (f.eks. 'Pugger matte 📚')" maxlength="60">
+        <input type="text" id="status-input" placeholder="Sett en status..." maxlength="60">
         <button class="btn-yellow" onclick="setStatus()">Sett status</button>
       </div>
       <div class="penalty-note">⚠ Overnatting-straff: glemmer du å sjekke ut og midnatt passerer, annulleres økten og 30 minutter trekkes fra totalen din.</div>
@@ -217,15 +217,15 @@
     <!-- THREE LEADERBOARDS -->
     <div class="lb-grid">
       <div class="lb-panel">
-        <div class="lb-panel-title today-title">🌤 I dag</div>
+        <div class="lb-panel-title today-title">🌤 Dagens kriger</div>
         <ul class="lb-list" id="lb-today"></ul>
       </div>
       <div class="lb-panel">
-        <div class="lb-panel-title week-title">📅 Denne uken</div>
+        <div class="lb-panel-title week-title">📅 Ukas kriger</div>
         <ul class="lb-list" id="lb-week"></ul>
       </div>
       <div class="lb-panel">
-        <div class="lb-panel-title alltime-title">🏆 All tid</div>
+        <div class="lb-panel-title alltime-title">🏆 Tidenes kriger</div>
         <ul class="lb-list" id="lb-alltime"></ul>
       </div>
     </div>
@@ -244,7 +244,7 @@
 
   </div>
 
-  <footer>STUDY TRACK — Synkronisert i sanntid via Firebase</footer>
+  <footer>MORTENSINE — Den som sitter lengst ler lengst</footer>
 </div>
 <div class="toast-wrap" id="toasts"></div>
 
