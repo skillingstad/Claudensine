@@ -12,18 +12,20 @@
     --text: #111111; --muted2: #777777;
     --gold: #ffd700; --silver: #c0c0d0; --bronze: #cd7f32;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; overflow-x: hidden; }
   body::before {
     content: ''; position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(232,255,71,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(232,255,71,0.03) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(232,255,71,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,255,71,0.03) 1px, transparent 1px);
     background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
   .glow-orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
   .glow-orb.one { width: 400px; height: 400px; background: rgba(232,255,71,0.06); top: -100px; left: -100px; }
   .glow-orb.two { width: 300px; height: 300px; background: rgba(71,255,232,0.05); bottom: 100px; right: -50px; }
-  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
+  /* HEADER */
   header { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
   .header-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .logo { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 8px; opacity: 0.8; }
@@ -32,34 +34,42 @@
   .clock-display { font-family: 'Space Mono', monospace; font-size: clamp(20px, 4vw, 32px); color: var(--accent); font-weight: 700; text-align: right; }
   .date-display { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted2); text-align: right; margin-top: 4px; letter-spacing: 0.1em; }
 
+  /* STATUS */
   #conn-status { display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-size: 11px; padding: 7px 14px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); margin-bottom: 28px; }
   .conn-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted2); transition: background 0.3s; }
   .conn-dot.ok { background: var(--accent2); animation: pulse 1.5s ease-in-out infinite; }
   .conn-dot.err { background: var(--accent3); }
 
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
   .card-title { font-size: 11px; font-family: 'Space Mono', monospace; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted2); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
   .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
+  /* INPUTS */
   .row { display: flex; gap: 12px; flex-wrap: wrap; }
   input[type="text"] { flex: 1; min-width: 160px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 15px; padding: 12px 16px; outline: none; transition: border-color 0.2s; }
   input[type="text"]:focus { border-color: var(--accent); }
   input::placeholder { color: var(--muted2); }
   select { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; padding: 10px 14px; outline: none; cursor: pointer; flex: 1; min-width: 140px; }
-  button { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.06em; border: none; border-radius: 8px; padding: 12px 22px; cursor: pointer; text-transform: uppercase; transition: transform 0.1s, box-shadow 0.2s; }
+
+  /* BUTTONS */
+  button { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.06em; border: none; border-radius: 8px; padding: 12px 20px; cursor: pointer; text-transform: uppercase; transition: transform 0.1s, box-shadow 0.2s; white-space: nowrap; }
   button:active { transform: scale(0.97); }
-  button:disabled { opacity: 0.35; cursor: not-allowed; }
-  .btn-yellow { background: var(--accent); color: #ffffff; }
+  button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-yellow { background: var(--accent); color: #0a0a0f; }
   .btn-yellow:not(:disabled):hover { box-shadow: 0 0 20px rgba(232,255,71,0.3); }
-  .btn-cyan { background: var(--accent2); color: #ffffff; }
+  .btn-cyan { background: var(--accent2); color: #0a0a0f; }
   .btn-cyan:not(:disabled):hover { box-shadow: 0 0 20px rgba(71,255,232,0.3); }
   .btn-red { background: var(--accent3); color: #fff; }
   .btn-red:not(:disabled):hover { box-shadow: 0 0 20px rgba(255,71,120,0.3); }
 
+  /* PRESENT */
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .tag { background: rgba(71,255,232,0.1); border: 1px solid rgba(71,255,232,0.25); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: var(--accent2); }
   .muted { color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 12px; }
+  .pulse-dot { display: inline-block; width: 7px; height: 7px; background: var(--accent2); border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
 
+  /* HIGHLIGHTS */
   .hl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media(max-width:520px){.hl-grid{grid-template-columns:1fr;}}
   .hl-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
@@ -69,71 +79,62 @@
   .hl-time { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted2); }
   .hl-empty { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted2); }
 
-  .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  /* LIVE SESSIONS */
+  .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
   .live-card { background: var(--surface2); border: 1px solid rgba(71,255,232,0.2); border-radius: 10px; padding: 16px; position: relative; overflow: hidden; }
   .live-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent2); }
   .live-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-  .live-since { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); margin-bottom: 10px; }
-  .live-dur { font-family: 'Space Mono', monospace; font-size: 20px; color: var(--accent2); font-weight: 700; }
+  .live-since { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); margin-bottom: 8px; }
+  .live-dur { font-family: 'Space Mono', monospace; font-size: 20px; color: var(--accent2); font-weight: 700; margin-top: 8px; }
+  .status-badge { display: inline-block; background: rgba(232,255,71,0.08); border: 1px solid rgba(232,255,71,0.2); border-radius: 6px; padding: 3px 8px; font-size: 10px; color: var(--accent); font-family: 'Space Mono', monospace; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+  /* THREE LEADERBOARDS SIDE BY SIDE */
+  .lb-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media(max-width:720px){ .lb-grid { grid-template-columns: 1fr; } }
+  .lb-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .lb-panel-title { font-size: 10px; font-family: 'Space Mono', monospace; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted2); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .lb-panel-title.today-title { color: var(--accent2); }
+  .lb-panel-title.week-title { color: var(--accent); }
+  .lb-panel-title.alltime-title { color: var(--accent3); }
   .lb-list { list-style: none; }
-  .lb-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 9px; margin-bottom: 8px; background: var(--surface2); border: 1px solid var(--border); animation: slideIn 0.3s ease both; }
+  .lb-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px; background: var(--surface2); border: 1px solid var(--border); }
   .lb-item.r1 { border-color: rgba(255,215,0,0.3); background: rgba(255,215,0,0.04); }
   .lb-item.r2 { border-color: rgba(192,192,208,0.2); }
   .lb-item.r3 { border-color: rgba(205,127,50,0.2); }
-  .lb-rank { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; width: 28px; text-align: center; flex-shrink: 0; }
+  .lb-rank { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; width: 24px; text-align: center; flex-shrink: 0; }
   .r1 .lb-rank { color: var(--gold); } .r2 .lb-rank { color: var(--silver); } .r3 .lb-rank { color: var(--bronze); }
-  .lb-name { font-weight: 700; font-size: 15px; }
-  .lb-live { font-size: 10px; color: var(--accent2); margin-left: 6px; }
-  .lb-sessions { font-size: 10px; color: var(--muted2); font-family: 'Space Mono', monospace; }
-  .lb-penalty { font-size: 10px; color: var(--accent3); font-family: 'Space Mono', monospace; }
-  .lb-time { font-family: 'Space Mono', monospace; font-size: 15px; color: var(--accent); font-weight: 700; }
-  .lb-right { text-align: right; }
-
-  .status-text { font-size: 11px; color: var(--muted2); font-style: italic; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
-  .status-badge { display: inline-block; background: rgba(232,255,71,0.08); border: 1px solid rgba(232,255,71,0.2); border-radius: 6px; padding: 3px 10px; font-size: 11px; color: var(--accent); font-family: 'Space Mono', monospace; margin-top: 6px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-name { font-weight: 700; font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-live { font-size: 9px; color: var(--accent2); margin-left: 4px; }
+  .lb-time { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 700; white-space: nowrap; }
+  .lb-empty { text-align: center; padding: 20px 0; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 11px; }
 
   /* CHAT */
-  #chat-messages { max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; padding-right: 4px; scroll-behavior: smooth; }
+  .chat-wrap { display: flex; flex-direction: column; height: 400px; }
+  #chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 6px; margin-bottom: 14px; scroll-behavior: smooth; }
   #chat-messages::-webkit-scrollbar { width: 4px; }
-  #chat-messages::-webkit-scrollbar-track { background: transparent; }
   #chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-  .chat-msg { display: flex; flex-direction: column; max-width: 75%; }
+  .chat-msg { display: flex; flex-direction: column; max-width: 78%; }
   .chat-msg.mine { align-self: flex-end; align-items: flex-end; }
   .chat-msg.theirs { align-self: flex-start; align-items: flex-start; }
-  .chat-bubble { padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; }
-  .mine .chat-bubble { background: var(--accent); color: #0a0a0f; border-bottom-right-radius: 4px; }
-  .theirs .chat-bubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-  .chat-meta { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); margin-top: 4px; }
-  .chat-name { font-weight: 700; margin-right: 6px; }
-  .chat-input-row { display: flex; gap: 10px; }
-  .chat-input-row input { flex: 1; }
-  .chat-empty { text-align: center; padding: 24px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 11px; }
+  .chat-bubble { padding: 9px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; }
+  .mine .chat-bubble { background: var(--accent); color: #0a0a0f; border-bottom-right-radius: 3px; }
+  .theirs .chat-bubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
+  .chat-meta { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); margin-top: 3px; }
+  .chat-sender { font-weight: 700; margin-right: 5px; }
+  .chat-row { display: flex; gap: 10px; }
+  .chat-row input[type="text"] { flex: 1; min-width: 0; }
+  .chat-empty { text-align: center; padding: 40px 0; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 11px; }
 
-  /* ADMIN */
-  .admin-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-  .admin-name { flex: 1; font-weight: 700; min-width: 100px; }
-  .admin-name input { background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; padding: 2px 4px; outline: none; width: 100%; transition: border-color 0.2s; }
-  .admin-name input:focus { border-bottom-color: var(--accent); }
-  .btn-sm { padding: 7px 14px; font-size: 11px; border-radius: 6px; }
-  .btn-save { background: var(--accent2); color: #0a0a0f; }
-  .btn-save:hover { box-shadow: 0 0 12px rgba(71,255,232,0.3); }
-  .btn-delete { background: rgba(255,71,120,0.15); color: var(--accent3); border: 1px solid rgba(255,71,120,0.3); }
-  .btn-delete:hover { background: rgba(255,71,120,0.25); }
-  .admin-stats { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); white-space: nowrap; }
-
+  /* MISC */
   .penalty-note { background: rgba(255,71,120,0.08); border: 1px solid rgba(255,71,120,0.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--accent3); font-family: 'Space Mono', monospace; margin-top: 16px; line-height: 1.6; }
-  .pulse-dot { display: inline-block; width: 7px; height: 7px; background: var(--accent2); border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
   .empty { text-align: center; padding: 28px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 12px; line-height: 1.8; }
-
   .toast-wrap { position: fixed; bottom: 28px; right: 28px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
   .toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 13px 18px; font-size: 13px; font-weight: 600; max-width: 280px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); animation: toastIn 0.3s ease; }
   .toast.e { border-left-color: var(--accent3); } .toast.i { border-left-color: var(--accent2); }
-
-  footer { text-align: center; padding: 48px 0 32px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.15em; border-top: 1px solid var(--border); margin-top: 32px; }
+  footer { text-align: center; padding: 48px 0 32px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.15em; border-top: 1px solid var(--border); margin-top: 8px; }
 
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-  @keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
 </style>
 </head>
@@ -146,7 +147,7 @@
     <div class="header-inner">
       <div>
         <div class="logo">// MORTENSINE</div>
-        <h1>Hvem <span>er</span> <span>på</span> skolen?</h1>
+        <h1>Hvem <span>er</span> <span>på</span>skolen?</h1>
       </div>
       <div>
         <div class="clock-display" id="live-clock">00:00:00</div>
@@ -162,6 +163,7 @@
 
   <div id="app" style="display:none">
 
+    <!-- REGISTER -->
     <div class="card">
       <div class="card-title">Registrer deg</div>
       <div class="row">
@@ -170,6 +172,7 @@
       </div>
     </div>
 
+    <!-- CHECK IN/OUT + STATUS -->
     <div class="card">
       <div class="card-title">Sjekk inn / ut</div>
       <div class="row">
@@ -178,49 +181,67 @@
         <button class="btn-red" id="btn-out" onclick="leave()" disabled>Locked out</button>
       </div>
       <div class="row" style="margin-top:12px">
-        <input type="text" id="status-input" placeholder="Skriv en status..." maxlength="60">
+        <input type="text" id="status-input" placeholder="Sett en status... " maxlength="60">
         <button class="btn-yellow" onclick="setStatus()">Sett status</button>
       </div>
       <div class="penalty-note">⚠ Overnatting-straff: glemmer du å sjekke ut og midnatt passerer, annulleres økten og 30 minutter trekkes fra totalen din.</div>
     </div>
 
+    <!-- WHO'S HERE -->
     <div class="card">
       <div class="card-title">På skolen nå</div>
       <div class="tags" id="present-now"><span class="muted">Ingen er inne ennå.</span></div>
     </div>
 
+    <!-- HIGHLIGHTS -->
     <div class="card">
       <div class="card-title">Dagens høydepunkter</div>
       <div class="hl-grid">
-        <div class="hl-box"><div class="hl-label a">🌅 Første inn</div><div id="hl-first"><div class="hl-empty">Ingen ankomster ennå.</div></div></div>
-        <div class="hl-box"><div class="hl-label b">🌙 Siste ut</div><div id="hl-last"><div class="hl-empty">Ingen har dratt ennå.</div></div></div>
+        <div class="hl-box">
+          <div class="hl-label a">🌅 Første inn</div>
+          <div id="hl-first"><div class="hl-empty">Ingen ankomster ennå.</div></div>
+        </div>
+        <div class="hl-box">
+          <div class="hl-label b">🌙 Siste ut</div>
+          <div id="hl-last"><div class="hl-empty">Ingen har dratt ennå.</div></div>
+        </div>
       </div>
     </div>
 
+    <!-- LIVE SESSIONS -->
     <div class="card" id="live-section" style="display:none">
       <div class="card-title">Live-økter</div>
       <div class="live-grid" id="live-grid"></div>
     </div>
 
-    <div class="card">
-      <div class="card-title">Leaderboard — All tid</div>
-      <ul class="lb-list" id="leaderboard"><div class="empty">Ingen data ennå.<br>Registrer deg og begynn å sjekke inn!</div></ul>
-    </div>
-
-    <div class="card" id="chat-card">
-      <div class="card-title">Chat 💬</div>
-      <div id="chat-messages"></div>
-      <div class="chat-input-row">
-        <input type="text" id="chat-input" placeholder="Skriv en melding..." maxlength="200" onkeydown="if(event.key==='Enter')sendChat()">
-        <button class="btn-cyan" onclick="sendChat()">Send</button>
+    <!-- THREE LEADERBOARDS -->
+    <div class="lb-grid">
+      <div class="lb-panel">
+        <div class="lb-panel-title today-title">🌤 I dag</div>
+        <ul class="lb-list" id="lb-today"></ul>
+      </div>
+      <div class="lb-panel">
+        <div class="lb-panel-title week-title">📅 Denne uken</div>
+        <ul class="lb-list" id="lb-week"></ul>
+      </div>
+      <div class="lb-panel">
+        <div class="lb-panel-title alltime-title">🏆 All tid</div>
+        <ul class="lb-list" id="lb-alltime"></ul>
       </div>
     </div>
-<!--
+
+    <!-- CHAT -->
     <div class="card">
-      <div class="card-title">⚙ Administrer brukere</div>
-      <div id="admin-list"></div>
+      <div class="card-title">Chat 💬</div>
+      <div class="chat-wrap">
+        <div id="chat-messages"><div class="chat-empty">Ingen meldinger ennå. Si hei! </div></div>
+        <div class="chat-row">
+          <input type="text" id="chat-input" placeholder="Skriv en melding..." maxlength="200">
+          <button class="btn-cyan" id="btn-send">Send</button>
+        </div>
+      </div>
     </div>
--->
+
   </div>
 
   <footer>MORTENSINE — Den som sitter lengst ler lengst</footer>
@@ -232,7 +253,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getDatabase, ref, onValue, update, set, push, query, limitToLast }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-// ── Firebase config (hardcoded) ────────────────────────────
+// ── Config ─────────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyBybGFgTkIvVSXYzQ0PzYSMFFmbfOAT2cg",
   authDomain: "claudensine.firebaseapp.com",
@@ -244,21 +265,22 @@ const firebaseConfig = {
   measurementId: "G-CMD346C44P"
 };
 
-let db = null;
-let state = { users: {}, today: null, firstIn: null, lastOut: null };
+let db, state = { users: {}, today: null, firstIn: null, lastOut: null };
+let chatMessages = [];
 
-// Boot immediately
 try {
   const app = initializeApp(firebaseConfig);
   db = getDatabase(app);
   listen();
 } catch(e) {
-  setConn('Feil ved tilkobling', 'err');
+  setConn('Feil', 'err');
   toast('Firebase feil: ' + e.message, 'e');
 }
 
+// ── Listeners ───────────────────────────────────────────────
 function listen() {
   setConn('Kobler til…', '');
+
   onValue(ref(db, 'studytrack'), snap => {
     state = snap.val() || { users: {}, today: todayStr(), firstIn: null, lastOut: null };
     if (!state.users) state.users = {};
@@ -266,59 +288,72 @@ function listen() {
     document.getElementById('app').style.display = '';
     checkNewDay();
     render();
-  }, e => {
-    setConn('Tilkoblingsfeil', 'err');
-    toast('Firebase: ' + e.message, 'e');
-  });
+  }, e => { setConn('Tilkoblingsfeil', 'err'); toast('Firebase: ' + e.message, 'e'); });
 
-  // Chat listener — siste 100 meldinger
   onValue(query(ref(db, 'chat'), limitToLast(100)), snap => {
-    const msgs = [];
-    snap.forEach(child => msgs.push({ id: child.key, ...child.val() }));
-    renderChat(msgs);
+    chatMessages = [];
+    snap.forEach(child => chatMessages.push({ id: child.key, ...child.val() }));
+    renderChat();
   });
 }
 
-window.sendChat = async function() {
+// ── Chat send (using addEventListener, not onclick) ─────────
+document.getElementById('btn-send').addEventListener('click', sendChat);
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendChat();
+});
+
+async function sendChat() {
   const k = sel();
-  if (!k) { toast('Velg deg selv først for å chatte.', 'e'); return; }
+  if (!k) { toast('Velg deg selv i nedtrekksmenyen først.', 'e'); return; }
   const inp = document.getElementById('chat-input');
   const text = inp.value.trim();
   if (!text) return;
   const u = state.users[k];
+  if (!u) return;
+  inp.value = '';
   await push(ref(db, 'chat'), {
     name: u.displayName,
     userKey: k,
     text,
     ts: Date.now()
   });
-  inp.value = '';
-};
+}
 
+// ── Helpers ─────────────────────────────────────────────────
 function setConn(txt, cls) {
   document.getElementById('conn-text').textContent = txt;
   document.getElementById('conn-dot').className = 'conn-dot ' + cls;
 }
 
-// ── Midnight penalty ───────────────────────────────────────
-function todayStr() { return new Date().toISOString().slice(0,10); }
+function todayStr() { return new Date().toISOString().slice(0, 10); }
 
+function weekStart() {
+  const d = new Date();
+  const day = d.getDay(); // 0=Sun
+  const diff = (day === 0 ? -6 : 1 - day); // Monday-based
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+// ── Midnight check ──────────────────────────────────────────
 async function checkNewDay() {
   if (state.today === todayStr()) return;
   const ups = { 'studytrack/today': todayStr(), 'studytrack/firstIn': null, 'studytrack/lastOut': null };
   let pen = false;
-  Object.entries(state.users||{}).forEach(([k,u]) => {
+  Object.entries(state.users || {}).forEach(([k, u]) => {
     if (u.active) {
       ups[`studytrack/users/${k}/active`] = null;
-      ups[`studytrack/users/${k}/penalty`] = (u.penalty||0) + 30*60*1000;
+      ups[`studytrack/users/${k}/penalty`] = (u.penalty || 0) + 30 * 60 * 1000;
       pen = true;
     }
   });
   await update(ref(db), ups);
-  if (pen) toast('Overnatting-straff trukket! 😬', 'e');
+  if (pen) toast('Overnatting-straff trukket! ', 'e');
 }
 
-// ── Actions ────────────────────────────────────────────────
+// ── Actions ─────────────────────────────────────────────────
 window.registerUser = async function() {
   const inp = document.getElementById('reg-name');
   const name = inp.value.trim();
@@ -326,7 +361,9 @@ window.registerUser = async function() {
   const k = key(name);
   if (state.users[k]) { toast(`"${name}" er allerede registrert!`, 'e'); return; }
   await set(ref(db, `studytrack/users/${k}`), {
-    displayName: name, totalMs: 0, penalty: 0, sessionCount: 0, active: null
+    displayName: name, totalMs: 0, todayMs: 0, weekMs: 0,
+    penalty: 0, sessionCount: 0, active: null,
+    lastActiveDate: todayStr(), lastActiveWeek: weekStart()
   });
   inp.value = '';
   toast(`Velkommen, ${name}! 🎉`);
@@ -340,7 +377,7 @@ window.arrive = async function() {
   const ups = { [`studytrack/users/${k}/active`]: now };
   if (!state.firstIn) ups['studytrack/firstIn'] = { name: u.displayName, time: now };
   await update(ref(db), ups);
-  toast(`${u.displayName} sjekket inn! 🏫`, 'i');
+  toast(`${u.displayName} locked in! 🏫`, 'i');
 };
 
 window.leave = async function() {
@@ -349,13 +386,26 @@ window.leave = async function() {
   if (!u.active) { toast(`${u.displayName} er ikke inne!`, 'e'); return; }
   const now = Date.now();
   const ms = now - u.active;
+  const today = todayStr();
+  const wkStart = weekStart();
+
+  // Reset counters if new day/week
+  const prevDay = u.lastActiveDate || today;
+  const prevWeek = u.lastActiveWeek || wkStart;
+  const todayAdd = (prevDay === today) ? (u.todayMs || 0) + ms : ms;
+  const weekAdd  = (prevWeek === wkStart) ? (u.weekMs || 0) + ms : ms;
+
   await update(ref(db), {
     [`studytrack/users/${k}/active`]: null,
-    [`studytrack/users/${k}/totalMs`]: (u.totalMs||0) + ms,
-    [`studytrack/users/${k}/sessionCount`]: (u.sessionCount||0) + 1,
+    [`studytrack/users/${k}/totalMs`]: (u.totalMs || 0) + ms,
+    [`studytrack/users/${k}/todayMs`]: todayAdd,
+    [`studytrack/users/${k}/weekMs`]: weekAdd,
+    [`studytrack/users/${k}/lastActiveDate`]: today,
+    [`studytrack/users/${k}/lastActiveWeek`]: wkStart,
+    [`studytrack/users/${k}/sessionCount`]: (u.sessionCount || 0) + 1,
     'studytrack/lastOut': { name: u.displayName, time: now }
   });
-  toast(`${u.displayName} sjekket ut — økt: ${dur(ms)} 🚪`, 'i');
+  toast(`${u.displayName} locked out — økt: ${dur(ms)} 🚪`, 'i');
 };
 
 window.setStatus = async function() {
@@ -364,27 +414,27 @@ window.setStatus = async function() {
   const status = document.getElementById('status-input').value.trim();
   await update(ref(db), { [`studytrack/users/${k}/status`]: status || null });
   document.getElementById('status-input').value = '';
-  toast(status ? `Status satt: "${status}"` : 'Status fjernet.', 'i');
+  toast(status ? `Status: "${status}"` : 'Status fjernet.', 'i');
 };
 
 function sel() { return document.getElementById('user-sel').value || null; }
 document.getElementById('user-sel').addEventListener('change', updateBtns);
 
-// ── Render ─────────────────────────────────────────────────
+// ── Render ──────────────────────────────────────────────────
 function render() {
-  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderLB(); renderAdmin();
+  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderAllLBs();
 }
 
 function renderSel() {
   const el = document.getElementById('user-sel');
   const prev = el.value;
   el.innerHTML = '<option value="">— Velg deg selv —</option>';
-  Object.entries(state.users||{})
-    .sort((a,b) => (a[1].displayName||'').localeCompare(b[1].displayName||''))
-    .forEach(([k,u]) => {
+  Object.entries(state.users || {})
+    .sort((a, b) => (a[1].displayName || '').localeCompare(b[1].displayName || ''))
+    .forEach(([k, u]) => {
       const o = document.createElement('option');
       o.value = k;
-      o.textContent = (u.displayName||k) + (u.active ? ' 🟢' : '');
+      o.textContent = (u.displayName || k) + (u.active ? ' 🟢' : '');
       el.appendChild(o);
     });
   if (prev) el.value = prev;
@@ -392,15 +442,14 @@ function renderSel() {
 }
 
 function updateBtns() {
-  const k = sel();
-  const u = k && state.users[k];
+  const k = sel(), u = k && state.users[k];
   document.getElementById('btn-in').disabled = !u || !!u.active;
   document.getElementById('btn-out').disabled = !u || !u.active;
 }
 
 function renderPresent() {
   const el = document.getElementById('present-now');
-  const here = Object.values(state.users||{}).filter(u => u.active);
+  const here = Object.values(state.users || {}).filter(u => u.active);
   el.innerHTML = here.length
     ? here.map(u => `<span class="tag"><span class="pulse-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('')
     : '<span class="muted">Ingen er på skolen akkurat nå.</span>';
@@ -416,7 +465,7 @@ function renderHighlights() {
 }
 
 function renderLive() {
-  const active = Object.values(state.users||{}).filter(u => u.active);
+  const active = Object.values(state.users || {}).filter(u => u.active);
   const sec = document.getElementById('live-section');
   if (!active.length) { sec.style.display = 'none'; return; }
   sec.style.display = '';
@@ -425,109 +474,90 @@ function renderLive() {
       <div class="live-name">${esc(u.displayName)}</div>
       <div class="live-since">Siden ${fmtT(u.active)}</div>
       ${u.status ? `<div class="status-badge">💬 ${esc(u.status)}</div>` : ''}
-      <div class="live-dur" style="margin-top:10px">${dur(Date.now() - u.active)}</div>
+      <div class="live-dur">${dur(Date.now() - u.active)}</div>
     </div>`).join('');
 }
 
-function renderLB() {
-  const lb = document.getElementById('leaderboard');
-  const entries = Object.values(state.users||{}).map(u => {
-    const live = u.active ? Date.now() - u.active : 0;
-    return {
-      name: u.displayName,
-      net: (u.totalMs||0) + live - (u.penalty||0),
-      live: !!u.active,
-      penalty: u.penalty||0,
-      sessions: (u.sessionCount||0) + (u.active ? 1 : 0)
-    };
-  }).sort((a,b) => b.net - a.net);
-
-  if (!entries.length) {
-    lb.innerHTML = '<div class="empty">Ingen data ennå.<br>Registrer deg og begynn å sjekke inn!</div>';
-    return;
-  }
+function renderAllLBs() {
+  const today = todayStr();
+  const wkStart = weekStart();
   const medals = ['🥇','🥈','🥉'];
-  lb.innerHTML = entries.map((e, i) => `
-    <li class="lb-item ${i<3?'r'+(i+1):''}" style="animation-delay:${i*40}ms">
+
+  const users = Object.values(state.users || {});
+
+  function lbItem(e, i) {
+    return `<li class="lb-item ${i<3?'r'+(i+1):''}" style="animation-delay:${i*30}ms">
       <div class="lb-rank">${medals[i] || '#'+(i+1)}</div>
-      <div style="flex:1">
-        <div class="lb-name">${esc(e.name)}${e.live ? '<span class="lb-live">● LIVE</span>' : ''}</div>
-        <div class="lb-sessions">${e.sessions} økt${e.sessions !== 1 ? 'er' : ''}</div>
-        ${e.penalty ? `<div class="lb-penalty">−${dur(e.penalty)} straff</div>` : ''}
-      </div>
-      <div class="lb-right"><div class="lb-time">${dur(Math.max(0, e.net))}</div></div>
-    </li>`).join('');
+      <div class="lb-name">${esc(e.name)}${e.live ? '<span class="lb-live">●</span>' : ''}</div>
+      <div class="lb-time">${dur(Math.max(0, e.net))}</div>
+    </li>`;
+  }
+  function emptyMsg() { return '<div class="lb-empty">Ingen data ennå.</div>'; }
+
+  // TODAY
+  const todayEntries = users.map(u => {
+    const liveMs = u.active ? Date.now() - u.active : 0;
+    const base = (u.lastActiveDate === today) ? (u.todayMs || 0) : 0;
+    return { name: u.displayName, net: base + liveMs, live: !!u.active };
+  }).filter(e => e.net > 0).sort((a,b) => b.net - a.net);
+
+  const lbToday = document.getElementById('lb-today');
+  lbToday.innerHTML = todayEntries.length ? todayEntries.map(lbItem).join('') : emptyMsg();
+
+  // THIS WEEK
+  const weekEntries = users.map(u => {
+    const liveMs = u.active ? Date.now() - u.active : 0;
+    const base = (u.lastActiveWeek === wkStart) ? (u.weekMs || 0) : 0;
+    return { name: u.displayName, net: base + liveMs, live: !!u.active };
+  }).filter(e => e.net > 0).sort((a,b) => b.net - a.net);
+
+  const lbWeek = document.getElementById('lb-week');
+  lbWeek.innerHTML = weekEntries.length ? weekEntries.map(lbItem).join('') : emptyMsg();
+
+  // ALL TIME
+  const allEntries = users.map(u => {
+    const liveMs = u.active ? Date.now() - u.active : 0;
+    return { name: u.displayName, net: (u.totalMs || 0) + liveMs - (u.penalty || 0), live: !!u.active };
+  }).filter(e => e.net > 0).sort((a,b) => b.net - a.net);
+
+  const lbAll = document.getElementById('lb-alltime');
+  lbAll.innerHTML = allEntries.length ? allEntries.map(lbItem).join('') : emptyMsg();
 }
 
-function renderChat(msgs) {
+function renderChat() {
   const el = document.getElementById('chat-messages');
   const myKey = sel();
-  const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
 
-  if (!msgs.length) {
-    el.innerHTML = '<div class="chat-empty">Ingen meldinger ennå. Si hei! 👋</div>';
+  if (!chatMessages.length) {
+    el.innerHTML = '<div class="chat-empty">Ingen meldinger ennå. Si hei! </div>';
     return;
   }
 
-  el.innerHTML = msgs.map(m => {
+  el.innerHTML = chatMessages.map(m => {
     const mine = m.userKey === myKey;
     return `<div class="chat-msg ${mine ? 'mine' : 'theirs'}">
       <div class="chat-bubble">${esc(m.text)}</div>
-      <div class="chat-meta">
-        ${!mine ? `<span class="chat-name">${esc(m.name)}</span>` : ''}
-        ${fmtT(m.ts)}
-      </div>
+      <div class="chat-meta">${!mine ? `<span class="chat-sender">${esc(m.name)}</span>` : ''}${fmtT(m.ts)}</div>
     </div>`;
   }).join('');
 
-  if (wasAtBottom) el.scrollTop = el.scrollHeight;
+  if (atBottom || chatMessages.length <= 3) el.scrollTop = el.scrollHeight;
 }
 
-function renderAdmin() {
-  const el = document.getElementById('admin-list');
-  const users = Object.entries(state.users||{});
-  if (!users.length) { el.innerHTML = '<div class="empty" style="padding:16px">Ingen brukere ennå.</div>'; return; }
-  el.innerHTML = users
-    .sort((a,b) => (a[1].displayName||'').localeCompare(b[1].displayName||''))
-    .map(([k, u]) => `
-      <div class="admin-row">
-        <div class="admin-name">
-          <input type="text" id="admin-inp-${k}" value="${esc(u.displayName)}" maxlength="30">
-        </div>
-        <div class="admin-stats">${dur((u.totalMs||0)-(u.penalty||0))} totalt${u.active ? ' 🟢' : ''}</div>
-        <button class="btn-sm btn-save" onclick="renameUser('${k}')">Lagre</button>
-        <button class="btn-sm btn-delete" onclick="deleteUser('${k}', '${esc(u.displayName)}')">Slett</button>
-      </div>`).join('');
-}
-
-window.renameUser = async function(k) {
-  const inp = document.getElementById('admin-inp-' + k);
-  const newName = inp.value.trim();
-  if (!newName) { toast('Navn kan ikke være tomt.', 'e'); return; }
-  await update(ref(db), { [`studytrack/users/${k}/displayName`]: newName });
-  toast(`Navn oppdatert til "${newName}" ✅`, 'i');
-};
-
-window.deleteUser = async function(k, displayName) {
-  if (!confirm(`Er du sikker på at du vil slette "${displayName}"? All data deres forsvinner.`)) return;
-  await set(ref(db, `studytrack/users/${k}`), null);
-  toast(`"${displayName}" er slettet.`, 'e');
-};
-
-// ── Tick every second ──────────────────────────────────────
+// ── Tick ────────────────────────────────────────────────────
 setInterval(() => {
   const now = new Date();
   document.getElementById('live-clock').textContent = now.toLocaleTimeString('nb-NO');
   document.getElementById('live-date').textContent =
     now.toLocaleDateString('nb-NO', { weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
-  renderLive();
-  renderLB();
+  if (db) { renderLive(); renderAllLBs(); }
 }, 10000);
 
-// ── Utils ──────────────────────────────────────────────────
+// ── Utils ────────────────────────────────────────────────────
 function key(n) { return n.toLowerCase().replace(/[^a-z0-9æøå]/g, '_').slice(0, 40); }
 function dur(ms) {
-  if (ms < 0) ms = 0;
+  if (!ms || ms < 0) ms = 0;
   const s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sc = s%60;
   if (h > 0) return `${h}t ${String(m).padStart(2,'0')}m`;
   if (m > 0) return `${m}m ${String(sc).padStart(2,'0')}s`;
