@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MORTENSINE — Hvem er på skolen?</title>
+<title>StudyTrack — Who Grinds Hardest?</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -92,6 +92,24 @@
 
   .status-text { font-size: 11px; color: var(--muted2); font-style: italic; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
   .status-badge { display: inline-block; background: rgba(232,255,71,0.08); border: 1px solid rgba(232,255,71,0.2); border-radius: 6px; padding: 3px 10px; font-size: 11px; color: var(--accent); font-family: 'Space Mono', monospace; margin-top: 6px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* CHAT */
+  #chat-messages { max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; padding-right: 4px; scroll-behavior: smooth; }
+  #chat-messages::-webkit-scrollbar { width: 4px; }
+  #chat-messages::-webkit-scrollbar-track { background: transparent; }
+  #chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .chat-msg { display: flex; flex-direction: column; max-width: 75%; }
+  .chat-msg.mine { align-self: flex-end; align-items: flex-end; }
+  .chat-msg.theirs { align-self: flex-start; align-items: flex-start; }
+  .chat-bubble { padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; }
+  .mine .chat-bubble { background: var(--accent); color: #0a0a0f; border-bottom-right-radius: 4px; }
+  .theirs .chat-bubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .chat-meta { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); margin-top: 4px; }
+  .chat-name { font-weight: 700; margin-right: 6px; }
+  .chat-input-row { display: flex; gap: 10px; }
+  .chat-input-row input { flex: 1; }
+  .chat-empty { text-align: center; padding: 24px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 11px; }
+
   .penalty-note { background: rgba(255,71,120,0.08); border: 1px solid rgba(255,71,120,0.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--accent3); font-family: 'Space Mono', monospace; margin-top: 16px; line-height: 1.6; }
   .pulse-dot { display: inline-block; width: 7px; height: 7px; background: var(--accent2); border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
   .empty { text-align: center; padding: 28px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 12px; line-height: 1.8; }
@@ -177,6 +195,15 @@
       <ul class="lb-list" id="leaderboard"><div class="empty">Ingen data ennå.<br>Registrer deg og begynn å sjekke inn!</div></ul>
     </div>
 
+    <div class="card" id="chat-card">
+      <div class="card-title">Chat 💬</div>
+      <div id="chat-messages"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-input" placeholder="Skriv en melding..." maxlength="200" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn-cyan" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+
   </div>
 
   <footer>STUDY TRACK — Synkronisert i sanntid via Firebase</footer>
@@ -185,7 +212,7 @@
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue, update, set }
+import { getDatabase, ref, onValue, update, set, push, query, limitToLast }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 // ── Firebase config (hardcoded) ────────────────────────────
@@ -226,7 +253,30 @@ function listen() {
     setConn('Tilkoblingsfeil', 'err');
     toast('Firebase: ' + e.message, 'e');
   });
+
+  // Chat listener — siste 100 meldinger
+  onValue(query(ref(db, 'chat'), limitToLast(100)), snap => {
+    const msgs = [];
+    snap.forEach(child => msgs.push({ id: child.key, ...child.val() }));
+    renderChat(msgs);
+  });
 }
+
+window.sendChat = async function() {
+  const k = sel();
+  if (!k) { toast('Velg deg selv først for å chatte.', 'e'); return; }
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  const u = state.users[k];
+  await push(ref(db, 'chat'), {
+    name: u.displayName,
+    userKey: k,
+    text,
+    ts: Date.now()
+  });
+  inp.value = '';
+};
 
 function setConn(txt, cls) {
   document.getElementById('conn-text').textContent = txt;
@@ -390,6 +440,30 @@ function renderLB() {
       </div>
       <div class="lb-right"><div class="lb-time">${dur(Math.max(0, e.net))}</div></div>
     </li>`).join('');
+}
+
+function renderChat(msgs) {
+  const el = document.getElementById('chat-messages');
+  const myKey = sel();
+  const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+
+  if (!msgs.length) {
+    el.innerHTML = '<div class="chat-empty">Ingen meldinger ennå. Si hei! 👋</div>';
+    return;
+  }
+
+  el.innerHTML = msgs.map(m => {
+    const mine = m.userKey === myKey;
+    return `<div class="chat-msg ${mine ? 'mine' : 'theirs'}">
+      <div class="chat-bubble">${esc(m.text)}</div>
+      <div class="chat-meta">
+        ${!mine ? `<span class="chat-name">${esc(m.name)}</span>` : ''}
+        ${fmtT(m.ts)}
+      </div>
+    </div>`;
+  }).join('');
+
+  if (wasAtBottom) el.scrollTop = el.scrollHeight;
 }
 
 // ── Tick every second ──────────────────────────────────────
