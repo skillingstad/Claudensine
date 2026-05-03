@@ -671,7 +671,7 @@ function renderCounters() {
 
   // Total LB
   const totalEntries = users
-    .map(u => ({ name: u.displayName, n: (u.coffeeCount||0) + (u.beerCount||0), c: u.coffeeCount||0, b: u.beerCount||0 }))
+    .map(u => ({ name: u.displayName, n: (u.coffeeCount||0) * 2(u.beerCount||0), c: u.coffeeCount||0, b: u.beerCount||0 }))
     .filter(e => e.n > 0).sort((a,b) => b.n - a.n);
   const lbT = document.getElementById('lb-drink-total');
   if (lbT) lbT.innerHTML = totalEntries.length
