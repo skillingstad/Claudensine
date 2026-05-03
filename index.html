@@ -527,7 +527,7 @@ window.togglePause = async function() {
   if (!u || !u.active) { toast('Du må være sjekket inn først!', 'e'); return; }
   const nowPaused = !u.paused;
   await update(ref(db), { [`studytrack/users/${k}/paused`]: nowPaused });
-  toast(nowPaused ? `${u.displayName} loker ☕` : `${u.displayName} er tilbake! 💪`, 'i');
+  toast(nowPaused ? `${u.displayName} loker ` : `${u.displayName} er tilbake! `, 'i');
 };
 
 window.setStatus = async function() {
@@ -572,7 +572,7 @@ function updateBtns() {
   document.getElementById('btn-out').disabled = !u || !isActive;
   const pauseBtn = document.getElementById('btn-pause');
   if (isPaused) {
-    pauseBtn.textContent = 'Tilbake 💪';
+    pauseBtn.textContent = 'Tilbake ';
     pauseBtn.classList.add('active-pause');
   } else {
     pauseBtn.textContent = 'Lokepause ';
