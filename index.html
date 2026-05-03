@@ -133,6 +133,15 @@
   .toast.e { border-left-color: var(--accent3); } .toast.i { border-left-color: var(--accent2); }
   footer { text-align: center; padding: 48px 0 32px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.15em; border-top: 1px solid var(--border); margin-top: 8px; }
 
+
+  /* ADMIN */
+  .admin-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .admin-name-col { font-weight: 700; min-width: 120px; flex: 1; }
+  .admin-stat { font-family: "Space Mono", monospace; font-size: 10px; color: var(--muted2); white-space: nowrap; }
+  .btn-sm { padding: 7px 12px; font-size: 11px; border-radius: 6px; }
+  .btn-save { background: var(--accent2); color: #fff; }
+  .btn-del  { background: rgba(200,0,0,0.1); color: var(--accent3); border: 1px solid rgba(200,0,0,0.25); }
+  .admin-time-input { width: 80px; min-width: 0; flex: none; font-family: "Space Mono", monospace; font-size: 13px; text-align: center; padding: 7px 8px; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -242,6 +251,13 @@
       </div>
     </div>
 
+
+    <!-- ADMIN -->
+    <div class="card">
+      <div class="card-title">⚙ Administrer brukere</div>
+      <div id="admin-list"></div>
+    </div>
+
   </div>
 
   <footer>MORTENSINE — Den som sitter lengst ler lengst</footer>
@@ -286,6 +302,7 @@ function listen() {
     if (!state.users) state.users = {};
     setConn('Live — tilkoblet', 'ok');
     document.getElementById('app').style.display = '';
+    attachChatListeners();
     checkNewDay();
     render();
   }, e => { setConn('Tilkoblingsfeil', 'err'); toast('Firebase: ' + e.message, 'e'); });
@@ -307,11 +324,15 @@ function listen() {
   });
 }
 
-// ── Chat send (using addEventListener, not onclick) ─────────
-document.getElementById('btn-send').addEventListener('click', sendChat);
-document.getElementById('chat-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') sendChat();
-});
+// ── Chat send — attached after app is visible ──────────────
+function attachChatListeners() {
+  const btn = document.getElementById('btn-send');
+  const inp = document.getElementById('chat-input');
+  if (btn._chatAttached) return;
+  btn._chatAttached = true;
+  btn.addEventListener('click', sendChat);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+}
 
 async function sendChat() {
   const inp = document.getElementById('chat-input');
@@ -456,7 +477,7 @@ document.getElementById('user-sel').addEventListener('change', updateBtns);
 
 // ── Render ──────────────────────────────────────────────────
 function render() {
-  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderAllLBs();
+  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderAllLBs(); renderAdmin();
 }
 
 function renderSel() {
@@ -581,6 +602,52 @@ function renderChat() {
     requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
   }
 }
+
+
+function renderAdmin() {
+  const el = document.getElementById('admin-list');
+  if (!el) return;
+  const users = Object.entries(state.users || {});
+  if (!users.length) { el.innerHTML = '<div style="padding:16px;color:var(--muted2);font-family:Space Mono,monospace;font-size:12px">Ingen brukere ennå.</div>'; return; }
+  el.innerHTML = users
+    .sort((a,b) => (a[1].displayName||'').localeCompare(b[1].displayName||''))
+    .map(([k, u]) => {
+      const totalH = Math.floor((u.totalMs||0)/3600000);
+      const totalM = Math.floor(((u.totalMs||0)%3600000)/60000);
+      return `<div class="admin-row">
+        <div class="admin-name-col">
+          <input type="text" id="aname-${k}" value="${esc(u.displayName)}" maxlength="30" style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:Syne,sans-serif;font-weight:700;font-size:14px;padding:2px 4px;outline:none;">
+        </div>
+        <div class="admin-stat">${dur((u.totalMs||0)-(u.penalty||0))} totalt${u.active?' 🟢':''}</div>
+        <input type="number" id="ah-${k}" class="admin-time-input" value="${totalH}" min="0" placeholder="t">
+        <span style="font-size:11px;color:var(--muted2)">t</span>
+        <input type="number" id="am-${k}" class="admin-time-input" value="${totalM}" min="0" max="59" placeholder="m">
+        <span style="font-size:11px;color:var(--muted2)">m</span>
+        <button class="btn-sm btn-save" onclick="saveAdmin('${k}')">Lagre</button>
+        <button class="btn-sm btn-del" onclick="deleteUser('${k}','${esc(u.displayName)}')">Slett</button>
+      </div>`;
+    }).join('');
+}
+
+window.saveAdmin = async function(k) {
+  const nameEl = document.getElementById('aname-' + k);
+  const hEl = document.getElementById('ah-' + k);
+  const mEl = document.getElementById('am-' + k);
+  const newName = nameEl.value.trim();
+  if (!newName) { toast('Navn kan ikke være tomt.', 'e'); return; }
+  const newMs = (parseInt(hEl.value)||0) * 3600000 + (parseInt(mEl.value)||0) * 60000;
+  await update(ref(db), {
+    [`studytrack/users/${k}/displayName`]: newName,
+    [`studytrack/users/${k}/totalMs`]: newMs,
+  });
+  toast(`${newName} oppdatert ✅`, 'i');
+};
+
+window.deleteUser = async function(k, name) {
+  if (!confirm(`Slette "${name}"? All data forsvinner.`)) return;
+  await set(ref(db, `studytrack/users/${k}`), null);
+  toast(`"${name}" slettet.`, 'e');
+};
 
 // ── Tick ────────────────────────────────────────────────────
 setInterval(() => {
