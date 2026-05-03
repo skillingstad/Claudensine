@@ -151,6 +151,15 @@
   .btn-beer:hover { box-shadow: 0 0 16px rgba(245,166,35,0.5); }
   .btn-beer:active { transform: scale(0.97); }
   .drink-counts { font-family: Space Mono,monospace; font-size: 10px; color: var(--muted2); margin-top: 2px; }
+
+  /* PAUSE */
+  .btn-pause { background: #8b6914; color: #fff; padding: 12px 20px; font-size: 13px; font-family: Syne,sans-serif; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase; transition: transform 0.1s, box-shadow 0.2s; }
+  .btn-pause:not(:disabled):hover { box-shadow: 0 0 20px rgba(139,105,20,0.4); }
+  .btn-pause:active { transform: scale(0.97); }
+  .btn-pause.active-pause { background: var(--accent); color: #0a0a0f; }
+  .btn-pause:disabled { opacity: 0.35; cursor: not-allowed; }
+  .tag-pause { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: #f5a623; }
+  .pause-dot { display: inline-block; width: 7px; height: 7px; background: #f5a623; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -196,6 +205,7 @@
       <div class="row">
         <select id="user-sel"><option value="">— Velg deg selv —</option></select>
         <button class="btn-cyan" id="btn-in" onclick="arrive()" disabled>Locked in</button>
+        <button class="btn-pause" id="btn-pause" onclick="togglePause()" disabled>Lokepause </button>
         <button class="btn-red" id="btn-out" onclick="leave()" disabled>Locked out</button>
       </div>
       <div class="row" style="margin-top:12px">
@@ -211,6 +221,12 @@
       <div class="tags" id="present-now"><span class="muted">Ingen er inne ennå.</span></div>
     </div>
 
+    <!-- ON PAUSE -->
+    <div class="card" id="pause-section" style="display:none">
+      <div class="card-title"> Lokere ☕</div>
+      <div class="tags" id="pause-now"></div>
+    </div>
+
     <!-- HIGHLIGHTS -->
     <div class="card">
       <div class="card-title">Dagens høydepunkter</div>
@@ -224,7 +240,7 @@
           <div id="hl-lastin"><div class="hl-empty">Ingen ankomster ennå.</div></div>
         </div>
         <div class="hl-box">
-          <div class="hl-label b">🌙 Siste ut </div>
+          <div class="hl-label b">🌙 Siste ut (all tid)</div>
           <div id="hl-last"><div class="hl-empty">Ingen har dratt ennå.</div></div>
         </div>
       </div>
@@ -254,11 +270,11 @@
 
     <!-- COUNTERS -->
     <div class="card">
-      <div class="card-title">Kaffekanne &amp; Pils på loftet ☕🍺</div>
+      <div class="card-title">Kaffe &amp; Pils ☕🍺</div>
       <div id="drink-register" style="margin-bottom:20px;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted2)">Velg deg selv i menyen ovenfor, trykk så:</span>
-        <button class="btn-coffee" onclick="addCount(null,'coffee')">☕ + Kaffekanne</button>
-        <button class="btn-beer" onclick="addCount(null,'beer')">🍺 + Pils på loftet</button>
+        <button class="btn-coffee" onclick="addCount(null,'coffee')">☕ + Kaffe</button>
+        <button class="btn-beer" onclick="addCount(null,'beer')">🍺 + Pils</button>
       </div>
       <div class="lb-grid" style="margin-bottom:0">
         <div class="lb-panel">
@@ -270,7 +286,7 @@
           <ul class="lb-list" id="lb-beer"><div class="lb-empty">Ingen pils ennå.</div></ul>
         </div>
         <div class="lb-panel">
-          <div class="lb-panel-title" style="color:var(--accent3)">🏅 Komplett spiller</div>
+          <div class="lb-panel-title" style="color:var(--accent3)">🏅 Total drikking</div>
           <ul class="lb-list" id="lb-drink-total"><div class="lb-empty">Ingen data ennå.</div></ul>
         </div>
       </div>
@@ -290,10 +306,12 @@
 
 
     <!-- ADMIN -->
+    <!--
     <div class="card">
       <div class="card-title">⚙ Administrer brukere</div>
       <div id="admin-list"></div>
     </div>
+      -->
 
   </div>
 
@@ -437,6 +455,7 @@ async function checkNewDay() {
   Object.entries(state.users || {}).forEach(([k, u]) => {
     if (u.active) {
       ups[`studytrack/users/${k}/active`] = null;
+      ups[`studytrack/users/${k}/paused`] = null;
       ups[`studytrack/users/${k}/penalty`] = (u.penalty || 0) + 30 * 60 * 1000;
       pen = true;
     }
@@ -490,6 +509,7 @@ window.leave = async function() {
 
   await update(ref(db), {
     [`studytrack/users/${k}/active`]: null,
+    [`studytrack/users/${k}/paused`]: null,
     [`studytrack/users/${k}/totalMs`]: (u.totalMs || 0) + ms,
     [`studytrack/users/${k}/todayMs`]: todayAdd,
     [`studytrack/users/${k}/weekMs`]: weekAdd,
@@ -499,6 +519,15 @@ window.leave = async function() {
     'studytrack/lastOut': { name: u.displayName, time: now }
   });
   toast(`${u.displayName} sjekket ut — økt: ${dur(ms)} 🚪`, 'i');
+};
+
+window.togglePause = async function() {
+  const k = sel(); if (!k) return;
+  const u = state.users[k];
+  if (!u || !u.active) { toast('Du må være sjekket inn først!', 'e'); return; }
+  const nowPaused = !u.paused;
+  await update(ref(db), { [`studytrack/users/${k}/paused`]: nowPaused });
+  toast(nowPaused ? `${u.displayName} loker ☕` : `${u.displayName} er tilbake! 💪`, 'i');
 };
 
 window.setStatus = async function() {
@@ -527,7 +556,7 @@ function renderSel() {
     .forEach(([k, u]) => {
       const o = document.createElement('option');
       o.value = k;
-      o.textContent = (u.displayName || k) + (u.active ? ' 🟢' : '');
+      o.textContent = (u.displayName || k) + (u.active ? (u.paused ? ' ☕' : ' 🟢') : '');
       el.appendChild(o);
     });
   if (prev) el.value = prev;
@@ -536,16 +565,38 @@ function renderSel() {
 
 function updateBtns() {
   const k = sel(), u = k && state.users[k];
-  document.getElementById('btn-in').disabled = !u || !!u.active;
-  document.getElementById('btn-out').disabled = !u || !u.active;
+  const isActive = u && !!u.active;
+  const isPaused = u && !!u.paused;
+  document.getElementById('btn-in').disabled = !u || isActive;
+  document.getElementById('btn-pause').disabled = !u || !isActive;
+  document.getElementById('btn-out').disabled = !u || !isActive;
+  const pauseBtn = document.getElementById('btn-pause');
+  if (isPaused) {
+    pauseBtn.textContent = 'Tilbake 💪';
+    pauseBtn.classList.add('active-pause');
+  } else {
+    pauseBtn.textContent = 'Lokepause ☕';
+    pauseBtn.classList.remove('active-pause');
+  }
 }
 
 function renderPresent() {
   const el = document.getElementById('present-now');
-  const here = Object.values(state.users || {}).filter(u => u.active);
+  const here = Object.values(state.users || {}).filter(u => u.active && !u.paused);
   el.innerHTML = here.length
     ? here.map(u => `<span class="tag"><span class="pulse-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('')
-    : '<span class="muted">Ingen er på skolen akkurat nå.</span>';
+    : '<span class="muted">Ingen jobber akkurat nå.</span>';
+
+  // Pause section
+  const onPause = Object.values(state.users || {}).filter(u => u.active && u.paused);
+  const pauseSec = document.getElementById('pause-section');
+  const pauseEl = document.getElementById('pause-now');
+  if (onPause.length) {
+    pauseSec.style.display = '';
+    pauseEl.innerHTML = onPause.map(u => `<span class="tag-pause"><span class="pause-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('');
+  } else {
+    pauseSec.style.display = 'none';
+  }
 }
 
 function renderHighlights() {
@@ -678,7 +729,7 @@ function renderCounters() {
 
   // Total LB
   const totalEntries = users
-    .map(u => ({ name: u.displayName, n: (u.coffeeCount||0) * 2(u.beerCount||0), c: u.coffeeCount||0, b: u.beerCount||0 }))
+    .map(u => ({ name: u.displayName, n: (u.coffeeCount||0) + (u.beerCount||0), c: u.coffeeCount||0, b: u.beerCount||0 }))
     .filter(e => e.n > 0).sort((a,b) => b.n - a.n);
   const lbT = document.getElementById('lb-drink-total');
   if (lbT) lbT.innerHTML = totalEntries.length
