@@ -214,13 +214,17 @@
     <!-- HIGHLIGHTS -->
     <div class="card">
       <div class="card-title">Dagens høydepunkter</div>
-      <div class="hl-grid">
+      <div class="hl-grid" style="grid-template-columns:1fr 1fr 1fr">
         <div class="hl-box">
           <div class="hl-label a">🌅 Første inn</div>
           <div id="hl-first"><div class="hl-empty">Ingen ankomster ennå.</div></div>
         </div>
         <div class="hl-box">
-          <div class="hl-label b">🌙 Siste ut</div>
+          <div class="hl-label" style="color:var(--accent2);font-family:Space Mono,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px">🚪 Sist inn</div>
+          <div id="hl-lastin"><div class="hl-empty">Ingen ankomster ennå.</div></div>
+        </div>
+        <div class="hl-box">
+          <div class="hl-label b">🌙 Siste ut (all tid)</div>
           <div id="hl-last"><div class="hl-empty">Ingen har dratt ennå.</div></div>
         </div>
       </div>
@@ -250,11 +254,11 @@
 
     <!-- COUNTERS -->
     <div class="card">
-      <div class="card-title">Kaffekanner &amp; Pils på Loftet ☕🍺</div>
+      <div class="card-title">Kaffekanne &amp; Pils på loftet ☕🍺</div>
       <div id="drink-register" style="margin-bottom:20px;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted2)">Velg deg selv i menyen ovenfor, trykk så:</span>
         <button class="btn-coffee" onclick="addCount(null,'coffee')">☕ + Kaffekanne</button>
-        <button class="btn-beer" onclick="addCount(null,'beer')">🍺 + Pils på Loftet </button>
+        <button class="btn-beer" onclick="addCount(null,'beer')">🍺 + Pils på loftet</button>
       </div>
       <div class="lb-grid" style="margin-bottom:0">
         <div class="lb-panel">
@@ -286,12 +290,11 @@
 
 
     <!-- ADMIN -->
-    <!--
     <div class="card">
       <div class="card-title">⚙ Administrer brukere</div>
       <div id="admin-list"></div>
     </div>
-    -->
+
   </div>
 
   <footer>MORTENSINE — Den som sitter lengst ler lengst</footer>
@@ -315,7 +318,7 @@ const firebaseConfig = {
   measurementId: "G-CMD346C44P"
 };
 
-let db, state = { users: {}, today: null, firstIn: null, lastOut: null };
+let db, state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
 let chatMessages = [];
 
 try {
@@ -332,7 +335,7 @@ function listen() {
   setConn('Kobler til…', '');
 
   onValue(ref(db, 'studytrack'), snap => {
-    state = snap.val() || { users: {}, today: todayStr(), firstIn: null, lastOut: null };
+    state = snap.val() || { users: {}, today: todayStr(), firstIn: null, lastIn: null, lastOut: null };
     if (!state.users) state.users = {};
     setConn('Live — tilkoblet', 'ok');
     document.getElementById('app').style.display = '';
@@ -429,7 +432,7 @@ function weekStart() {
 // ── Midnight check ──────────────────────────────────────────
 async function checkNewDay() {
   if (state.today === todayStr()) return;
-  const ups = { 'studytrack/today': todayStr(), 'studytrack/firstIn': null, 'studytrack/lastOut': null };
+  const ups = { 'studytrack/today': todayStr(), 'studytrack/firstIn': null, 'studytrack/lastIn': null };
   let pen = false;
   Object.entries(state.users || {}).forEach(([k, u]) => {
     if (u.active) {
@@ -465,6 +468,7 @@ window.arrive = async function() {
   const now = Date.now();
   const ups = { [`studytrack/users/${k}/active`]: now };
   if (!state.firstIn) ups['studytrack/firstIn'] = { name: u.displayName, time: now };
+  ups['studytrack/lastIn'] = { name: u.displayName, time: now };
   await update(ref(db), ups);
   toast(`${u.displayName} sjekket inn! 🏫`, 'i');
 };
@@ -548,8 +552,11 @@ function renderHighlights() {
   document.getElementById('hl-first').innerHTML = state.firstIn
     ? `<div class="hl-name">${esc(state.firstIn.name)}</div><div class="hl-time">${fmtT(state.firstIn.time)}</div>`
     : '<div class="hl-empty">Ingen ankomster i dag ennå.</div>';
+  document.getElementById('hl-lastin').innerHTML = state.lastIn
+    ? `<div class="hl-name">${esc(state.lastIn.name)}</div><div class="hl-time">${fmtT(state.lastIn.time)}</div>`
+    : '<div class="hl-empty">Ingen ankomster i dag ennå.</div>';
   document.getElementById('hl-last').innerHTML = state.lastOut
-    ? `<div class="hl-name">${esc(state.lastOut.name)}</div><div class="hl-time">${fmtT(state.lastOut.time)}</div>`
+    ? `<div class="hl-name">${esc(state.lastOut.name)}</div><div class="hl-time">${fmtDT(state.lastOut.time)}</div>`
     : '<div class="hl-empty">Ingen har dratt ennå.</div>';
 }
 
@@ -762,6 +769,7 @@ function dur(ms) {
   return `${sc}s`;
 }
 function fmtT(ts) { return new Date(ts).toLocaleTimeString('nb-NO', { hour:'2-digit', minute:'2-digit' }); }
+function fmtDT(ts) { const d = new Date(ts); const today = d.toDateString() === new Date().toDateString(); return today ? fmtT(ts) : d.toLocaleDateString('nb-NO',{day:'numeric',month:'short'}) + ' ' + fmtT(ts); }
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function toast(msg, type='') {
   const c = document.getElementById('toasts');
