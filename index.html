@@ -142,6 +142,20 @@
   .btn-save { background: var(--accent2); color: #fff; }
   .btn-del  { background: rgba(200,0,0,0.1); color: var(--accent3); border: 1px solid rgba(200,0,0,0.25); }
   .admin-time-input { width: 80px; min-width: 0; flex: none; font-family: "Space Mono", monospace; font-size: 13px; text-align: center; padding: 7px 8px; }
+
+  /* COUNTERS */
+  .counter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .counter-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; position: relative; }
+  .counter-emoji { font-size: 28px; margin-bottom: 6px; }
+  .counter-name { font-weight: 700; font-size: 13px; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .counter-counts { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+  .counter-badge { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px; font-family: "Space Mono", monospace; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+  .counter-badge .num { font-weight: 700; font-size: 15px; }
+  .counter-btns { display: flex; gap: 6px; justify-content: center; }
+  .btn-coffee { background: #6f4e37; color: #fff; padding: 7px 12px; font-size: 12px; border-radius: 7px; }
+  .btn-coffee:hover { box-shadow: 0 0 14px rgba(111,78,55,0.4); }
+  .btn-beer { background: #f5a623; color: #0a0a0f; padding: 7px 12px; font-size: 12px; border-radius: 7px; }
+  .btn-beer:hover { box-shadow: 0 0 14px rgba(245,166,35,0.4); }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -239,6 +253,14 @@
       </div>
     </div>
 
+    <!-- COUNTERS -->
+    <div class="card">
+      <div class="card-title">Kaffe &amp; Pils ☕🍺</div>
+      <div class="counter-grid" id="counter-grid">
+        <div class="muted" style="padding:12px">Ingen brukere ennå.</div>
+      </div>
+    </div>
+
     <!-- CHAT -->
     <div class="card">
       <div class="card-title">Chat 💬</div>
@@ -253,12 +275,10 @@
 
 
     <!-- ADMIN -->
-    <!--
     <div class="card">
       <div class="card-title">⚙ Administrer brukere</div>
       <div id="admin-list"></div>
     </div>
-    -->
 
   </div>
 
@@ -479,7 +499,7 @@ document.getElementById('user-sel').addEventListener('change', updateBtns);
 
 // ── Render ──────────────────────────────────────────────────
 function render() {
-  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderAllLBs(); renderAdmin();
+  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderAllLBs(); renderCounters(); renderAdmin();
 }
 
 function renderSel() {
@@ -605,6 +625,37 @@ function renderChat() {
   }
 }
 
+
+
+function renderCounters() {
+  const el = document.getElementById('counter-grid');
+  if (!el) return;
+  const users = Object.entries(state.users || {}).sort((a,b) => (a[1].displayName||'').localeCompare(b[1].displayName||''));
+  if (!users.length) { el.innerHTML = '<div class="muted" style="padding:12px">Ingen brukere ennå.</div>'; return; }
+  el.innerHTML = users.map(([k, u]) => `
+    <div class="counter-card">
+      <div class="counter-name">${esc(u.displayName)}</div>
+      <div class="counter-counts">
+        <div class="counter-badge">☕ <span class="num">${u.coffeeCount || 0}</span></div>
+        <div class="counter-badge">🍺 <span class="num">${u.beerCount || 0}</span></div>
+      </div>
+      <div class="counter-btns">
+        <button class="btn-coffee" onclick="addCount('${k}','coffee')">+ Kaffe</button>
+        <button class="btn-beer" onclick="addCount('${k}','beer')">+ Pils</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.addCount = async function(k, type) {
+  const u = state.users[k];
+  if (!u) return;
+  const field = type === 'coffee' ? 'coffeeCount' : 'beerCount';
+  const emoji = type === 'coffee' ? '☕' : '🍺';
+  const newVal = (u[field] || 0) + 1;
+  await update(ref(db), { [`studytrack/users/${k}/${field}`]: newVal });
+  toast(`${emoji} ${u.displayName} — ${newVal} ${type === 'coffee' ? 'kaffe' : 'pils'}!`, 'i');
+};
 
 function renderAdmin() {
   const el = document.getElementById('admin-list');
