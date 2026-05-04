@@ -35,7 +35,7 @@
   .date-display { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted2); text-align: right; margin-top: 4px; letter-spacing: 0.1em; }
 
   /* STATUS */
-  #conn-status { display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-size: 11px; padding: 7px 14px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); margin-bottom: 28px; }
+
   .conn-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted2); transition: background 0.3s; }
   .conn-dot.ok { background: var(--accent2); animation: pulse 1.5s ease-in-out infinite; }
   .conn-dot.err { background: var(--accent3); }
@@ -158,8 +158,34 @@
   .btn-pause:active { transform: scale(0.97); }
   .btn-pause.active-pause { background: var(--accent); color: #ffffff; }
   .btn-pause:disabled { opacity: 0.35; cursor: not-allowed; }
-  .tag-pause { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: #f5a623; }
+  .tag-pause { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: #C4A484; }
   .pause-dot { display: inline-block; width: 7px; height: 7px; background: #C4A484; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
+
+  /* QUOTE */
+  #conn-status { display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-size: 11px; padding: 7px 14px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); margin-bottom: 28px; }
+  #quote-bar { display: none; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  #quote-bar.visible { display: flex; }
+  .quote-text { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); font-style: italic; flex: 1; min-width: 0; opacity: 0.85; }
+  .quote-author { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); white-space: nowrap; }
+  .btn-edit-quote { background: transparent; border: 1px solid var(--border); color: var(--muted2); font-size: 10px; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: Space Mono,monospace; letter-spacing: 0.1em; }
+  .btn-edit-quote:hover { border-color: var(--accent); color: var(--accent); }
+  .quote-edit-row { display: none; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .quote-edit-row.visible { display: flex; }
+
+  /* PHOTO WALL */
+  .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .photo-item { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 1; background: var(--surface2); border: 1px solid var(--border); cursor: pointer; }
+  .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.2s; }
+  .photo-item:hover img { transform: scale(1.04); }
+  .photo-meta { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 10px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); font-size: 11px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .photo-del { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.5); border: none; color: #fff; border-radius: 50%; width: 24px; height: 24px; font-size: 13px; cursor: pointer; display: none; align-items: center; justify-content: center; line-height: 1; }
+  .photo-item:hover .photo-del { display: flex; }
+  .photo-add-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  /* LIGHTBOX */
+  #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out; }
+  #lightbox.open { display: flex; }
+  #lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 10px; object-fit: contain; }
+
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -183,12 +209,25 @@
     </div>
   </header>
 
-  <div id="conn-status">
-    <div class="conn-dot" id="conn-dot"></div>
-    <span id="conn-text">Kobler til…</span>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:0">
+    <div id="conn-status" style="margin-bottom:0">
+      <div class="conn-dot" id="conn-dot"></div>
+      <span id="conn-text">Kobler til…</span>
+    </div>
+    <div id="quote-bar">
+      <span class="quote-text" id="quote-display"></span>
+      <span class="quote-author" id="quote-author-display"></span>
+      <button class="btn-edit-quote" onclick="toggleQuoteEdit()">✏ Endre</button>
+    </div>
+  </div>
+  <div class="quote-edit-row" id="quote-edit-row" style="margin-top:10px;margin-bottom:16px">
+    <input type="text" id="quote-input" placeholder="Dagens quote..." maxlength="120" style="flex:2;min-width:180px">
+    <input type="text" id="quote-author-input" placeholder="— Hvem sa det?" maxlength="40" style="flex:1;min-width:120px">
+    <button class="btn-yellow" onclick="saveQuote()">Lagre</button>
+    <button class="btn-edit-quote" onclick="toggleQuoteEdit()">Avbryt</button>
   </div>
 
-  <div id="app" style="display:none">
+  <div id="app" style="display:none;margin-top:16px">
 
     <!-- REGISTER -->
     <div class="card">
@@ -205,7 +244,7 @@
       <div class="row">
         <select id="user-sel"><option value="">— Velg deg selv —</option></select>
         <button class="btn-cyan" id="btn-in" onclick="arrive()" disabled>Locked in</button>
-        <button class="btn-pause" id="btn-pause" onclick="togglePause()" disabled>Lokepause </button>
+        <button class="btn-pause" id="btn-pause" onclick="togglePause()" disabled>Lokepause</button>
         <button class="btn-red" id="btn-out" onclick="leave()" disabled>Locked out</button>
       </div>
       <div class="row" style="margin-top:12px">
@@ -223,7 +262,7 @@
 
     <!-- ON PAUSE -->
     <div class="card" id="pause-section" style="display:none">
-      <div class="card-title">Lokere </div>
+      <div class="card-title">Har pause nå ☕</div>
       <div class="tags" id="pause-now"></div>
     </div>
 
@@ -236,7 +275,7 @@
           <div id="hl-first"><div class="hl-empty">Ingen ankomster ennå.</div></div>
         </div>
         <div class="hl-box">
-          <div class="hl-label" style="color:var(--accent2);font-family:Space Mono,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px">🚪 Sist inn</div>
+          <div class="hl-label" style="color:var(--accent2);font-family:Space Mono,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px">🚪 Siste inn</div>
           <div id="hl-lastin"><div class="hl-empty">Ingen ankomster ennå.</div></div>
         </div>
         <div class="hl-box">
@@ -270,7 +309,7 @@
 
     <!-- COUNTERS -->
     <div class="card">
-      <div class="card-title">Kaffekanner &amp; Pils på Loftet ☕🍺</div>
+      <div class="card-title">Kaffekanner &amp; Pils på Loftet☕🍺</div>
       <div id="drink-register" style="margin-bottom:20px;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted2)">Velg deg selv i menyen ovenfor, trykk så:</span>
         <button class="btn-coffee" onclick="addCount(null,'coffee')">☕ + Kaffekanne</button>
@@ -287,7 +326,7 @@
         </div>
         <div class="lb-panel">
           <div class="lb-panel-title" style="color:var(--accent3)">🏅 Komplett spiller</div>
-          <ul class="lb-list" id="lb-drink-total"><div class="lb-empty">Ingen komplette spillere.</div></ul>
+          <ul class="lb-list" id="lb-drink-total"><div class="lb-empty">Ingen komplette spillere enda.</div></ul>
         </div>
       </div>
     </div>
@@ -305,13 +344,24 @@
     </div>
 
 
+    <!-- PHOTO WALL -->
+    <div class="card">
+      <div class="card-title">Bildevegg </div>
+      <div class="photo-add-row">
+        <input type="text" id="photo-url-input" placeholder="Lim inn bilde-URL (jpg, png, gif...)" style="flex:1;min-width:200px">
+        <input type="text" id="photo-caption-input" placeholder="Bildetekst (valgfritt)" style="flex:1;min-width:140px">
+        <button class="btn-yellow" onclick="addPhoto()">+ Legg til</button>
+      </div>
+      <div class="photo-grid" id="photo-grid"><div class="muted">Ingen bilder ennå. Vær den første!</div></div>
+    </div>
+
     <!-- ADMIN -->
-    <!--
+    
     <div class="card">
       <div class="card-title">⚙ Administrer brukere</div>
       <div id="admin-list"></div>
     </div>
-    -->
+  
 
   </div>
 
@@ -337,6 +387,7 @@ const firebaseConfig = {
 };
 
 let db, state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
+let photos = {};
 let chatMessages = [];
 
 try {
@@ -361,6 +412,27 @@ function listen() {
     checkNewDay();
     render();
   }, e => { setConn('Tilkoblingsfeil', 'err'); toast('Firebase: ' + e.message, 'e'); });
+
+  // Quote listener
+  onValue(ref(db, 'studytrack/quote'), snap => {
+    const q = snap.val();
+    const bar = document.getElementById('quote-bar');
+    const disp = document.getElementById('quote-display');
+    const auth = document.getElementById('quote-author-display');
+    if (q && q.text) {
+      disp.textContent = '"' + q.text + '"';
+      auth.textContent = q.author ? '— ' + q.author : '';
+      bar.classList.add('visible');
+    } else {
+      bar.classList.remove('visible');
+    }
+  });
+
+  // Photo listener
+  onValue(ref(db, 'photos'), snap => {
+    photos = snap.val() || {};
+    renderPhotos();
+  });
 
   onValue(ref(db, 'chat'), snap => {
     console.log('[chat-listener] FIRED. exists:', snap.exists());
@@ -544,7 +616,7 @@ document.getElementById('user-sel').addEventListener('change', updateBtns);
 
 // ── Render ──────────────────────────────────────────────────
 function render() {
-  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderAllLBs(); renderCounters(); renderAdmin();
+  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderAllLBs(); renderCounters(); renderPhotos(); renderAdmin();
 }
 
 function renderSel() {
@@ -823,6 +895,80 @@ window.deleteUser = async function(k, name) {
   toast(`"${name}" slettet.`, 'e');
 };
 
+
+// ── Quote ────────────────────────────────────────────────────
+window.toggleQuoteEdit = function() {
+  const row = document.getElementById('quote-edit-row');
+  row.classList.toggle('visible');
+  if (row.classList.contains('visible')) {
+    const cur = state.quote || {};
+    document.getElementById('quote-input').value = cur.text || '';
+    document.getElementById('quote-author-input').value = cur.author || '';
+    document.getElementById('quote-input').focus();
+  }
+};
+
+window.saveQuote = async function() {
+  const text = document.getElementById('quote-input').value.trim();
+  const author = document.getElementById('quote-author-input').value.trim();
+  await update(ref(db), {
+    'studytrack/quote': text ? { text, author: author || null } : null
+  });
+  document.getElementById('quote-edit-row').classList.remove('visible');
+  toast(text ? '💬 Quote oppdatert!' : 'Quote fjernet.', 'i');
+};
+
+// ── Photos ───────────────────────────────────────────────────
+window.addPhoto = async function() {
+  const urlEl = document.getElementById('photo-url-input');
+  const capEl = document.getElementById('photo-caption-input');
+  const url = urlEl.value.trim();
+  if (!url) { toast('Lim inn en bilde-URL først.', 'e'); return; }
+  const k = sel();
+  const addedBy = k && state.users[k] ? state.users[k].displayName : 'Anonym';
+  await push(ref(db, 'photos'), {
+    url,
+    caption: capEl.value.trim() || null,
+    addedBy,
+    ts: Date.now()
+  });
+  urlEl.value = '';
+  capEl.value = '';
+  toast('📸 Bilde lagt til!', 'i');
+};
+
+window.deletePhoto = async function(k) {
+  if (!confirm('Slette dette bildet?')) return;
+  await set(ref(db, 'photos/' + k), null);
+  toast('Bilde slettet.', 'e');
+};
+
+window.openLightbox = function(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').classList.add('open');
+};
+window.closeLightbox = function() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightbox-img').src = '';
+};
+
+function renderPhotos() {
+  const el = document.getElementById('photo-grid');
+  if (!el) return;
+  const entries = Object.entries(photos).sort((a,b) => (b[1].ts||0) - (a[1].ts||0));
+  if (!entries.length) {
+    el.innerHTML = '<div class="muted">Ingen bilder ennå. Vær den første! 📸</div>';
+    return;
+  }
+  el.innerHTML = entries.map(([k, p]) =>
+    '<div class="photo-item" onclick="openLightbox('' + p.url.replace(/'/g,"\'") + '')">'
+    + '<img src="' + esc(p.url) + '" alt="' + esc(p.caption||'') + '" loading="lazy" onerror="this.parentElement.style.display='none'">'
+    + (p.caption || p.addedBy ? '<div class="photo-meta">' + esc(p.caption || p.addedBy) + '</div>' : '')
+    + '<button class="photo-del" onclick="event.stopPropagation();deletePhoto('' + k + '')" title="Slett">✕</button>'
+    + '</div>'
+  ).join('');
+}
+
 // ── Tick ────────────────────────────────────────────────────
 setInterval(() => {
   const now = new Date();
@@ -853,5 +999,6 @@ function toast(msg, type='') {
   setTimeout(() => t.remove(), 3500);
 }
 </script>
+<div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""></div>
 </body>
 </html>
