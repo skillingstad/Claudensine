@@ -153,13 +153,13 @@
   .drink-counts { font-family: Space Mono,monospace; font-size: 10px; color: var(--muted2); margin-top: 2px; }
 
   /* PAUSE */
-  .btn-pause { background: #C4A484; color: #fff; padding: 12px 20px; font-size: 13px; font-family: Syne,sans-serif; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase; transition: transform 0.1s, box-shadow 0.2s; }
+  .btn-pause { background: #8b6914; color: #fff; padding: 12px 20px; font-size: 13px; font-family: Syne,sans-serif; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase; transition: transform 0.1s, box-shadow 0.2s; }
   .btn-pause:not(:disabled):hover { box-shadow: 0 0 20px rgba(139,105,20,0.4); }
   .btn-pause:active { transform: scale(0.97); }
-  .btn-pause.active-pause { background: var(--accent); color: #C4A484; }
+  .btn-pause.active-pause { background: var(--accent); color: #0a0a0f; }
   .btn-pause:disabled { opacity: 0.35; cursor: not-allowed; }
   .tag-pause { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: #f5a623; }
-  .pause-dot { display: inline-block; width: 7px; height: 7px; background: #C4A484; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
+  .pause-dot { display: inline-block; width: 7px; height: 7px; background: #f5a623; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -205,7 +205,7 @@
       <div class="row">
         <select id="user-sel"><option value="">— Velg deg selv —</option></select>
         <button class="btn-cyan" id="btn-in" onclick="arrive()" disabled>Locked in</button>
-        <button class="btn-pause" id="btn-pause" onclick="togglePause()" disabled>Lokepause </button>
+        <button class="btn-pause" id="btn-pause" onclick="togglePause()" disabled>Pause ☕</button>
         <button class="btn-red" id="btn-out" onclick="leave()" disabled>Locked out</button>
       </div>
       <div class="row" style="margin-top:12px">
@@ -223,7 +223,7 @@
 
     <!-- ON PAUSE -->
     <div class="card" id="pause-section" style="display:none">
-      <div class="card-title"> Lokere </div>
+      <div class="card-title">Har pause nå ☕</div>
       <div class="tags" id="pause-now"></div>
     </div>
 
@@ -240,7 +240,7 @@
           <div id="hl-lastin"><div class="hl-empty">Ingen ankomster ennå.</div></div>
         </div>
         <div class="hl-box">
-          <div class="hl-label b">🌙 Siste ut </div>
+          <div class="hl-label b">🌙 Siste ut (all tid)</div>
           <div id="hl-last"><div class="hl-empty">Ingen har dratt ennå.</div></div>
         </div>
       </div>
@@ -270,11 +270,11 @@
 
     <!-- COUNTERS -->
     <div class="card">
-      <div class="card-title">Kaffekanner &amp; Pils på Loftet ☕🍺</div>
+      <div class="card-title">Kaffe &amp; Pils ☕🍺</div>
       <div id="drink-register" style="margin-bottom:20px;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted2)">Velg deg selv i menyen ovenfor, trykk så:</span>
-        <button class="btn-coffee" onclick="addCount(null,'coffee')">☕ + Kaffekanne </button>
-        <button class="btn-beer" onclick="addCount(null,'beer')">🍺 + Pils på Loftet </button>
+        <button class="btn-coffee" onclick="addCount(null,'coffee')">☕ + Kaffe</button>
+        <button class="btn-beer" onclick="addCount(null,'beer')">🍺 + Pils</button>
       </div>
       <div class="lb-grid" style="margin-bottom:0">
         <div class="lb-panel">
@@ -286,7 +286,7 @@
           <ul class="lb-list" id="lb-beer"><div class="lb-empty">Ingen pils ennå.</div></ul>
         </div>
         <div class="lb-panel">
-          <div class="lb-panel-title" style="color:var(--accent3)">🏅 Komplett spiller</div>
+          <div class="lb-panel-title" style="color:var(--accent3)">🏅 Total drikking</div>
           <ul class="lb-list" id="lb-drink-total"><div class="lb-empty">Ingen data ennå.</div></ul>
         </div>
       </div>
@@ -306,12 +306,10 @@
 
 
     <!-- ADMIN -->
-    <!--
     <div class="card">
       <div class="card-title">⚙ Administrer brukere</div>
       <div id="admin-list"></div>
     </div>
-      -->
 
   </div>
 
@@ -527,7 +525,7 @@ window.togglePause = async function() {
   if (!u || !u.active) { toast('Du må være sjekket inn først!', 'e'); return; }
   const nowPaused = !u.paused;
   await update(ref(db), { [`studytrack/users/${k}/paused`]: nowPaused });
-  toast(nowPaused ? `${u.displayName} loker ` : `${u.displayName} er tilbake! `, 'i');
+  toast(nowPaused ? `${u.displayName} tar pause ☕` : `${u.displayName} er tilbake! 💪`, 'i');
 };
 
 window.setStatus = async function() {
@@ -572,10 +570,10 @@ function updateBtns() {
   document.getElementById('btn-out').disabled = !u || !isActive;
   const pauseBtn = document.getElementById('btn-pause');
   if (isPaused) {
-    pauseBtn.textContent = 'Tilbake ';
+    pauseBtn.textContent = 'Tilbake 💪';
     pauseBtn.classList.add('active-pause');
   } else {
-    pauseBtn.textContent = 'Lokepause ';
+    pauseBtn.textContent = 'Pause ☕';
     pauseBtn.classList.remove('active-pause');
   }
 }
@@ -729,7 +727,7 @@ function renderCounters() {
 
   // Total LB
   const totalEntries = users
-    .map(u => ({ name: u.displayName, n: (u.coffeeCount||0) * 2(u.beerCount||0), c: u.coffeeCount||0, b: u.beerCount||0 }))
+    .map(u => ({ name: u.displayName, n: (u.coffeeCount||0) + (u.beerCount||0), c: u.coffeeCount||0, b: u.beerCount||0 }))
     .filter(e => e.n > 0).sort((a,b) => b.n - a.n);
   const lbT = document.getElementById('lb-drink-total');
   if (lbT) lbT.innerHTML = totalEntries.length
@@ -761,36 +759,58 @@ function renderAdmin() {
   if (!el) return;
   const users = Object.entries(state.users || {});
   if (!users.length) { el.innerHTML = '<div style="padding:16px;color:var(--muted2);font-family:Space Mono,monospace;font-size:12px">Ingen brukere ennå.</div>'; return; }
+
+  function hm(ms) {
+    const h = Math.floor((ms||0)/3600000);
+    const m = Math.floor(((ms||0)%3600000)/60000);
+    return { h, m };
+  }
+  function timeInputs(prefix, k, ms) {
+    const {h, m} = hm(ms);
+    return `
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+        <span style="font-size:9px;color:var(--muted2);letter-spacing:.1em">${prefix}</span>
+        <input type="number" id="${prefix}-h-${k}" class="admin-time-input" value="${h}" min="0" style="width:52px">
+        <span style="font-size:11px;color:var(--muted2)">t</span>
+        <input type="number" id="${prefix}-m-${k}" class="admin-time-input" value="${m}" min="0" max="59" style="width:52px">
+        <span style="font-size:11px;color:var(--muted2)">m</span>
+      </div>`;
+  }
+
   el.innerHTML = users
     .sort((a,b) => (a[1].displayName||'').localeCompare(b[1].displayName||''))
-    .map(([k, u]) => {
-      const totalH = Math.floor((u.totalMs||0)/3600000);
-      const totalM = Math.floor(((u.totalMs||0)%3600000)/60000);
-      return `<div class="admin-row">
-        <div class="admin-name-col">
+    .map(([k, u]) => `
+      <div class="admin-row" style="flex-wrap:wrap;gap:8px">
+        <div class="admin-name-col" style="min-width:100px;flex:1">
           <input type="text" id="aname-${k}" value="${esc(u.displayName)}" maxlength="30" style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:Syne,sans-serif;font-weight:700;font-size:14px;padding:2px 4px;outline:none;">
         </div>
-        <div class="admin-stat">${dur((u.totalMs||0)-(u.penalty||0))} totalt${u.active?' 🟢':''}</div>
-        <input type="number" id="ah-${k}" class="admin-time-input" value="${totalH}" min="0" placeholder="t">
-        <span style="font-size:11px;color:var(--muted2)">t</span>
-        <input type="number" id="am-${k}" class="admin-time-input" value="${totalM}" min="0" max="59" placeholder="m">
-        <span style="font-size:11px;color:var(--muted2)">m</span>
+        ${timeInputs('TOT', k, u.totalMs||0)}
+        ${timeInputs('UKE', k, u.weekMs||0)}
+        ${timeInputs('DAG', k, u.todayMs||0)}
         <button class="btn-sm btn-save" onclick="saveAdmin('${k}')">Lagre</button>
         <button class="btn-sm btn-del" onclick="deleteUser('${k}','${esc(u.displayName)}')">Slett</button>
-      </div>`;
-    }).join('');
+      </div>`).join('');
 }
 
 window.saveAdmin = async function(k) {
-  const nameEl = document.getElementById('aname-' + k);
-  const hEl = document.getElementById('ah-' + k);
-  const mEl = document.getElementById('am-' + k);
-  const newName = nameEl.value.trim();
+  const newName = document.getElementById('aname-' + k).value.trim();
   if (!newName) { toast('Navn kan ikke være tomt.', 'e'); return; }
-  const newMs = (parseInt(hEl.value)||0) * 3600000 + (parseInt(mEl.value)||0) * 60000;
+
+  function getMs(prefix) {
+    const h = parseInt(document.getElementById(prefix + '-h-' + k).value) || 0;
+    const m = parseInt(document.getElementById(prefix + '-m-' + k).value) || 0;
+    return h * 3600000 + m * 60000;
+  }
+
+  const newTotal = getMs('TOT');
+  const newWeek  = getMs('UKE');
+  const newToday = getMs('DAG');
+
   await update(ref(db), {
     [`studytrack/users/${k}/displayName`]: newName,
-    [`studytrack/users/${k}/totalMs`]: newMs,
+    [`studytrack/users/${k}/totalMs`]:    newTotal,
+    [`studytrack/users/${k}/weekMs`]:     newWeek,
+    [`studytrack/users/${k}/todayMs`]:    newToday,
   });
   toast(`${newName} oppdatert ✅`, 'i');
 };
