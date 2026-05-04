@@ -153,13 +153,13 @@
   .drink-counts { font-family: Space Mono,monospace; font-size: 10px; color: var(--muted2); margin-top: 2px; }
 
   /* PAUSE */
-  .btn-pause { background: #8b6914; color: #fff; padding: 12px 20px; font-size: 13px; font-family: Syne,sans-serif; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase; transition: transform 0.1s, box-shadow 0.2s; }
+  .btn-pause { background: #C4A484; color: #fff; padding: 12px 20px; font-size: 13px; font-family: Syne,sans-serif; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase; transition: transform 0.1s, box-shadow 0.2s; }
   .btn-pause:not(:disabled):hover { box-shadow: 0 0 20px rgba(139,105,20,0.4); }
   .btn-pause:active { transform: scale(0.97); }
   .btn-pause.active-pause { background: var(--accent); color: #0a0a0f; }
   .btn-pause:disabled { opacity: 0.35; cursor: not-allowed; }
   .tag-pause { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: #f5a623; }
-  .pause-dot { display: inline-block; width: 7px; height: 7px; background: #f5a623; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
+  .pause-dot { display: inline-block; width: 7px; height: 7px; background: #C4A484; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -205,7 +205,7 @@
       <div class="row">
         <select id="user-sel"><option value="">— Velg deg selv —</option></select>
         <button class="btn-cyan" id="btn-in" onclick="arrive()" disabled>Locked in</button>
-        <button class="btn-pause" id="btn-pause" onclick="togglePause()" disabled>Pause ☕</button>
+        <button class="btn-pause" id="btn-pause" onclick="togglePause()" disabled>Lokepause </button>
         <button class="btn-red" id="btn-out" onclick="leave()" disabled>Locked out</button>
       </div>
       <div class="row" style="margin-top:12px">
@@ -223,7 +223,7 @@
 
     <!-- ON PAUSE -->
     <div class="card" id="pause-section" style="display:none">
-      <div class="card-title">Har pause nå ☕</div>
+      <div class="card-title">Lokere </div>
       <div class="tags" id="pause-now"></div>
     </div>
 
@@ -527,7 +527,7 @@ window.togglePause = async function() {
   if (!u || !u.active) { toast('Du må være sjekket inn først!', 'e'); return; }
   const nowPaused = !u.paused;
   await update(ref(db), { [`studytrack/users/${k}/paused`]: nowPaused });
-  toast(nowPaused ? `${u.displayName} tar pause ☕` : `${u.displayName} er tilbake! 💪`, 'i');
+  toast(nowPaused ? `${u.displayName} loker` : `${u.displayName} er tilbake! `, 'i');
 };
 
 window.setStatus = async function() {
@@ -572,7 +572,7 @@ function updateBtns() {
   document.getElementById('btn-out').disabled = !u || !isActive;
   const pauseBtn = document.getElementById('btn-pause');
   if (isPaused) {
-    pauseBtn.textContent = 'Tilbake 💪';
+    pauseBtn.textContent = 'Tilbake ';
     pauseBtn.classList.add('active-pause');
   } else {
     pauseBtn.textContent = 'Pause ☕';
