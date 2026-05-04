@@ -236,11 +236,11 @@
           <div id="hl-first"><div class="hl-empty">Ingen ankomster ennå.</div></div>
         </div>
         <div class="hl-box">
-          <div class="hl-label" style="color:var(--accent2);font-family:Space Mono,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px">🚪 Sist inn</div>
+          <div class="hl-label" style="color:var(--accent2);font-family:Space Mono,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px">🚪 Siste inn</div>
           <div id="hl-lastin"><div class="hl-empty">Ingen ankomster ennå.</div></div>
         </div>
         <div class="hl-box">
-          <div class="hl-label b">🌙 Siste ut (all tid)</div>
+          <div class="hl-label b">🌙 Siste ut </div>
           <div id="hl-last"><div class="hl-empty">Ingen har dratt ennå.</div></div>
         </div>
       </div>
@@ -270,11 +270,11 @@
 
     <!-- COUNTERS -->
     <div class="card">
-      <div class="card-title">Kaffe &amp; Pils ☕🍺</div>
+      <div class="card-title">Kaffekanner &amp; Pils på Loftet☕🍺</div>
       <div id="drink-register" style="margin-bottom:20px;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted2)">Velg deg selv i menyen ovenfor, trykk så:</span>
-        <button class="btn-coffee" onclick="addCount(null,'coffee')">☕ + Kaffe</button>
-        <button class="btn-beer" onclick="addCount(null,'beer')">🍺 + Pils</button>
+        <button class="btn-coffee" onclick="addCount(null,'coffee')">☕ + Kaffekanne</button>
+        <button class="btn-beer" onclick="addCount(null,'beer')">🍺 + Pils på Loftet</button>
       </div>
       <div class="lb-grid" style="margin-bottom:0">
         <div class="lb-panel">
@@ -286,8 +286,8 @@
           <ul class="lb-list" id="lb-beer"><div class="lb-empty">Ingen pils ennå.</div></ul>
         </div>
         <div class="lb-panel">
-          <div class="lb-panel-title" style="color:var(--accent3)">🏅 Total drikking</div>
-          <ul class="lb-list" id="lb-drink-total"><div class="lb-empty">Ingen data ennå.</div></ul>
+          <div class="lb-panel-title" style="color:var(--accent3)">🏅 Komplett spiller</div>
+          <ul class="lb-list" id="lb-drink-total"><div class="lb-empty">Ingen komplette spillere enda.</div></ul>
         </div>
       </div>
     </div>
@@ -729,7 +729,7 @@ function renderCounters() {
 
   // Total LB
   const totalEntries = users
-    .map(u => ({ name: u.displayName, n: (u.coffeeCount||0) + (u.beerCount||0), c: u.coffeeCount||0, b: u.beerCount||0 }))
+    .map(u => ({ name: u.displayName, n: (u.coffeeCount||0) * 2(u.beerCount||0), c: u.coffeeCount||0, b: u.beerCount||0 }))
     .filter(e => e.n > 0).sort((a,b) => b.n - a.n);
   const lbT = document.getElementById('lb-drink-total');
   if (lbT) lbT.innerHTML = totalEntries.length
