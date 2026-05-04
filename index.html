@@ -160,6 +160,16 @@
   .btn-pause:disabled { opacity: 0.35; cursor: not-allowed; }
   .tag-pause { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: #f5a623; }
   .pause-dot { display: inline-block; width: 7px; height: 7px; background: #C4A484; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
+
+  /* QUOTE */
+  #quote-bar { display: none; align-items: center; gap: 10px; margin-top: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  #quote-bar.visible { display: flex; }
+  .quote-text { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); font-style: italic; flex: 1; min-width: 0; opacity: 0.9; }
+  .quote-author { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); white-space: nowrap; }
+  .btn-edit-quote { background: transparent; border: 1px solid var(--border); color: var(--muted2); font-size: 10px; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: Space Mono,monospace; letter-spacing: 0.1em; transition: border-color 0.2s, color 0.2s; }
+  .btn-edit-quote:hover { border-color: var(--accent); color: var(--accent); }
+  #quote-edit-row { display: none; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  #quote-edit-row.visible { display: flex; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -186,6 +196,18 @@
   <div id="conn-status">
     <div class="conn-dot" id="conn-dot"></div>
     <span id="conn-text">Kobler til…</span>
+  </div>
+
+  <div id="quote-bar">
+    <span class="quote-text" id="quote-display"></span>
+    <span class="quote-author" id="quote-author-display"></span>
+    <button class="btn-edit-quote" onclick="toggleQuoteEdit()">✏ Endre quote</button>
+  </div>
+  <div id="quote-edit-row">
+    <input type="text" id="quote-input" placeholder="Dagens quote..." maxlength="140" style="flex:2;min-width:180px">
+    <input type="text" id="quote-author-input" placeholder="— Hvem sa det?" maxlength="50" style="flex:1;min-width:120px">
+    <button class="btn-yellow" onclick="saveQuote()">Lagre</button>
+    <button class="btn-edit-quote" onclick="toggleQuoteEdit()">Avbryt</button>
   </div>
 
   <div id="app" style="display:none">
@@ -361,6 +383,25 @@ function listen() {
     checkNewDay();
     render();
   }, e => { setConn('Tilkoblingsfeil', 'err'); toast('Firebase: ' + e.message, 'e'); });
+
+  onValue(ref(db, 'studytrack/quote'), snap => {
+    const q = snap.val();
+    const bar = document.getElementById('quote-bar');
+    const disp = document.getElementById('quote-display');
+    const auth = document.getElementById('quote-author-display');
+    if (q && q.text) {
+      disp.textContent = '“' + q.text + '”';
+      auth.textContent = q.author ? '— ' + q.author : '';
+      bar.classList.add('visible');
+    } else {
+      disp.textContent = '';
+      auth.textContent = '';
+      bar.classList.remove('visible');
+      bar.classList.add('visible');
+      disp.textContent = 'Ingen quote satt ennå — trykk ✨ Endre quote for å legge til en!';
+      bar.style.opacity = '0.4';
+    }
+  });
 
   onValue(ref(db, 'chat'), snap => {
     console.log('[chat-listener] FIRED. exists:', snap.exists());
@@ -821,6 +862,29 @@ window.deleteUser = async function(k, name) {
   if (!confirm(`Slette "${name}"? All data forsvinner.`)) return;
   await set(ref(db, `studytrack/users/${k}`), null);
   toast(`"${name}" slettet.`, 'e');
+};
+
+
+// ── Quote ────────────────────────────────────────────────────
+window.toggleQuoteEdit = function() {
+  const row = document.getElementById('quote-edit-row');
+  row.classList.toggle('visible');
+  if (row.classList.contains('visible')) {
+    const q = state.quote || {};
+    document.getElementById('quote-input').value = q.text || '';
+    document.getElementById('quote-author-input').value = q.author || '';
+    document.getElementById('quote-input').focus();
+  }
+};
+
+window.saveQuote = async function() {
+  const text = document.getElementById('quote-input').value.trim();
+  const author = document.getElementById('quote-author-input').value.trim();
+  await update(ref(db), {
+    'studytrack/quote': text ? { text, author: author || null } : null
+  });
+  document.getElementById('quote-edit-row').classList.remove('visible');
+  toast(text ? '💬 Quote oppdatert!' : 'Quote fjernet.', 'i');
 };
 
 // ── Tick ────────────────────────────────────────────────────
