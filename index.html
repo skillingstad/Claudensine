@@ -1052,7 +1052,7 @@ function checkExamBanner() {
     banner.style.background = 'rgba(255,71,120,0.08)';
     banner.style.borderColor = 'rgba(255,71,120,0.5)';
     if (dot) dot.style.background = 'var(--accent3)';
-    if (txt) { txt.style.color = 'var(--accent3)'; txt.textContent = '🚨 EKSAMEN I DAG — LYK TIL ALLE!'; }
+    if (txt) { txt.style.color = 'var(--accent3)'; txt.textContent = '🚨 !EKSAMENSDAG! 🚨'; }
     const upcoming = EXAM_DATES.filter(d => d > today);
     sub.textContent = upcoming.length
       ? 'Neste eksamen: ' + fmtDate(upcoming[0])
