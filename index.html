@@ -189,6 +189,28 @@
   .chat-send-row input { flex: 1; min-width: 0; }
   .chat-empty-msg { text-align: center; padding: 40px 0; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 11px; }
 */
+  /* EXAM BANNER */
+  #exam-banner {
+    display: none;
+    background: rgba(255,71,120,0.08);
+    border: 1px solid rgba(255,71,120,0.5);
+    border-radius: 12px;
+    padding: 14px 22px;
+    margin-bottom: 24px;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  #exam-banner.show { display: flex; }
+  .exam-blink {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent3);
+    flex-shrink: 0;
+    animation: examBlink 1s ease-in-out infinite;
+  }
+  .exam-text { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent3); font-weight: 700; letter-spacing: 0.05em; }
+  .exam-sub { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); letter-spacing: 0.1em; margin-top: 2px; }
+  @keyframes examBlink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -211,6 +233,16 @@
       </div>
     </div>
   </header>
+
+
+  <!-- EXAM BANNER -->
+  <div id="exam-banner">
+    <div class="exam-blink"></div>
+    <div>
+      <div class="exam-text">🚨! EKSAMENSDAG !🚨</div>
+      <div class="exam-sub" id="exam-sub"></div>
+    </div>
+  </div>
 
   <div id="conn-status">
     <div class="conn-dot" id="conn-dot"></div>
@@ -990,6 +1022,55 @@ function renderChat() {
     requestAnimationFrame(function() { log.scrollTop = log.scrollHeight; });
   }
 }
+
+
+// ── Exam banner ───────────────────────────────────────────────
+const EXAM_DATES = [
+  '2026-05-06', '2026-05-09', '2026-05-11',
+  '2026-05-13', '2026-05-16', '2026-05-27',
+  '2026-06-04'
+];
+
+function checkExamBanner() {
+  const today = new Date().toISOString().slice(0, 10);
+  const banner = document.getElementById('exam-banner');
+  const sub = document.getElementById('exam-sub');
+  if (!banner) return;
+  if (EXAM_DATES.includes(today)) {
+    banner.classList.add('show');
+    // Find next exam after today for sub-text
+    const upcoming = EXAM_DATES.filter(d => d > today);
+    sub.textContent = upcoming.length
+      ? 'Neste eksamen: ' + fmtDate(upcoming[0])
+      : 'Dette er siste eksamen — dere er snart ferdige! 🎉';
+  } else {
+    banner.classList.remove('show');
+    // Show upcoming exam as info
+    const next = EXAM_DATES.find(d => d >= today);
+    if (next) {
+      banner.classList.add('show');
+      banner.style.background = 'rgba(232,255,71,0.05)';
+      banner.style.borderColor = 'rgba(232,255,71,0.2)';
+      const dot = banner.querySelector('.exam-blink');
+      if (dot) dot.style.background = 'var(--accent)';
+      const txt = banner.querySelector('.exam-text');
+      if (txt) { txt.style.color = 'var(--accent)'; txt.textContent = '📅 Neste eksamen: ' + fmtDate(next); }
+      sub.textContent = daysUntil(next) === 1 ? '— I morgen!' : '— Om ' + daysUntil(next) + ' dager';
+    }
+  }
+}
+
+function fmtDate(iso) {
+  return new Date(iso + 'T12:00:00').toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+function daysUntil(iso) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(iso + 'T00:00:00');
+  return Math.round((target - today) / 86400000);
+}
+
+checkExamBanner();
 
 // ── Tick ────────────────────────────────────────────────────
 setInterval(() => {
