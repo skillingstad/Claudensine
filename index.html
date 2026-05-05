@@ -243,12 +243,12 @@
       <div class="exam-sub" id="exam-sub"></div>
     </div>
   </div>
-
+<!--
   <div id="conn-status">
     <div class="conn-dot" id="conn-dot"></div>
     <span id="conn-text">Kobler til…</span>
   </div>
-
+-->
   <div id="quote-bar">
     <span class="quote-text" id="quote-display"></span>
     <span class="quote-author" id="quote-author-display"></span>
@@ -1042,7 +1042,7 @@ function checkExamBanner() {
     const upcoming = EXAM_DATES.filter(d => d > today);
     sub.textContent = upcoming.length
       ? 'Neste eksamen: ' + fmtDate(upcoming[0])
-      : 'Dette er siste eksamen — dere er snart ferdige! 🎉';
+      : 'Dette er siste eksamen — dere er snart ferdige!';
   } else {
     banner.classList.remove('show');
     // Show upcoming exam as info
@@ -1054,7 +1054,7 @@ function checkExamBanner() {
       const dot = banner.querySelector('.exam-blink');
       if (dot) dot.style.background = 'var(--accent)';
       const txt = banner.querySelector('.exam-text');
-      if (txt) { txt.style.color = 'var(--accent)'; txt.textContent = '📅 Neste eksamen: ' + fmtDate(next); }
+      if (txt) { txt.style.color = 'var(--accent)'; txt.textContent = 'Neste eksamen: ' + fmtDate(next); }
       sub.textContent = daysUntil(next) === 1 ? '— I morgen!' : '— Om ' + daysUntil(next) + ' dager';
     }
   }
