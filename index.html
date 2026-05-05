@@ -108,6 +108,22 @@
   .lb-time { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 700; white-space: nowrap; }
   .lb-empty { text-align: center; padding: 20px 0; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 11px; }
 
+  /* CHAT */
+  .chat-wrap { display: flex; flex-direction: column; height: 400px; }
+  #chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 6px; margin-bottom: 14px; scroll-behavior: smooth; }
+  #chat-messages::-webkit-scrollbar { width: 4px; }
+  #chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .chat-msg { display: flex; flex-direction: column; max-width: 78%; }
+  .chat-msg.mine { align-self: flex-end; align-items: flex-end; }
+  .chat-msg.theirs { align-self: flex-start; align-items: flex-start; }
+  .chat-bubble { padding: 9px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; }
+  .mine .chat-bubble { background: var(--accent); color: #0a0a0f; border-bottom-right-radius: 3px; }
+  .theirs .chat-bubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
+  .chat-meta { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); margin-top: 3px; }
+  .chat-sender { font-weight: 700; margin-right: 5px; }
+  .chat-row { display: flex; gap: 10px; }
+  .chat-row input[type="text"] { flex: 1; min-width: 0; }
+  .chat-empty { text-align: center; padding: 40px 0; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 11px; }
 
   /* MISC */
   .penalty-note { background: rgba(255,71,120,0.08); border: 1px solid rgba(255,71,120,0.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--accent3); font-family: 'Space Mono', monospace; margin-top: 16px; line-height: 1.6; }
@@ -154,38 +170,6 @@
   .btn-edit-quote:hover { border-color: var(--accent); color: var(--accent); }
   #quote-edit-row { display: none; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
   #quote-edit-row.visible { display: flex; }
-
-  /* PHOTO WALL */
-  .photo-add-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-  .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-  .photo-item { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 1; background: var(--surface2); border: 1px solid var(--border); cursor: zoom-in; }
-  .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.25s; }
-  .photo-item:hover img { transform: scale(1.05); }
-  .photo-meta { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 10px; background: linear-gradient(transparent, rgba(0,0,0,0.75)); font-size: 11px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .photo-del { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.55); border: none; color: #fff; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; cursor: pointer; opacity: 0; transition: opacity 0.15s; display: flex; align-items: center; justify-content: center; }
-  .photo-item:hover .photo-del { opacity: 1; }
-  #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out; }
-  #lightbox.open { display: flex; }
-  #lightbox img { max-width: 92vw; max-height: 92vh; border-radius: 12px; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
-  #lightbox-close { position: fixed; top: 20px; right: 28px; background: none; border: none; color: #fff; font-size: 32px; cursor: pointer; opacity: 0.7; line-height: 1; }
-  #lightbox-close:hover { opacity: 1; }
-  /* CHAT */
-  .chat-box { display: flex; flex-direction: column; gap: 0; }
-  .chat-log { height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 4px 2px 12px 2px; }
-  .chat-log::-webkit-scrollbar { width: 4px; }
-  .chat-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-  .cmsg { display: flex; flex-direction: column; max-width: 75%; }
-  .cmsg.me { align-self: flex-end; align-items: flex-end; }
-  .cmsg.them { align-self: flex-start; align-items: flex-start; }
-  .cbubble { padding: 9px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; word-break: break-word; }
-  .me .cbubble { background: var(--accent); color: #0a0a0f; border-bottom-right-radius: 3px; }
-  .them .cbubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
-  .cmeta { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); margin-top: 3px; }
-  .csender { font-weight: 700; margin-right: 4px; }
-  .chat-send-row { display: flex; gap: 10px; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 14px; }
-  .chat-send-row input { flex: 1; min-width: 0; }
-  .chat-empty-msg { text-align: center; padding: 40px 0; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 11px; }
-
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -274,7 +258,7 @@
           <div id="hl-first"><div class="hl-empty">Ingen ankomster ennå.</div></div>
         </div>
         <div class="hl-box">
-          <div class="hl-label" style="color:var(--accent2);font-family:Space Mono,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px">🚪 Sist inn</div>
+          <div class="hl-label" style="color:var(--accent2);font-family:Space Mono,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px">🚪 Siste inn</div>
           <div id="hl-lastin"><div class="hl-empty">Ingen ankomster ennå.</div></div>
         </div>
         <div class="hl-box">
@@ -330,30 +314,18 @@
       </div>
     </div>
 
-    <!-- PHOTO WALL -->
-    <div class="card">
-      <div class="card-title">Bildevegg 📸</div>
-      <div class="photo-add-row">
-        <input type="text" id="photo-url" placeholder="Lim inn bilde-URL (imgur, discord, etc.)" style="flex:2;min-width:200px">
-        <input type="text" id="photo-cap" placeholder="Bildetekst (valgfritt)" style="flex:1;min-width:130px">
-        <button class="btn-yellow" onclick="addPhoto()">+ Legg til</button>
-      </div>
-      <div class="photo-grid" id="photo-grid">
-        <div class="muted">Ingen bilder ennå — vær den første! 📸</div>
-      </div>
-    </div>
-
     <!-- CHAT -->
     <div class="card">
       <div class="card-title">Chat 💬</div>
-      <div class="chat-box">
-        <div class="chat-log" id="chat-log"></div>
-        <div class="chat-send-row">
-          <input type="text" id="chat-inp" placeholder="Skriv en melding... (velg deg selv ovenfor)" maxlength="200">
-          <button class="btn-cyan" id="chat-btn" onclick="chatSend()">Send</button>
+      <div class="chat-wrap">
+        <div id="chat-messages"><div class="chat-empty">Ingen meldinger ennå. Si hei! 👋</div></div>
+        <div class="chat-row">
+          <input type="text" id="chat-input" placeholder="Skriv en melding..." maxlength="200">
+          <button class="btn-cyan" id="btn-send">Send</button>
         </div>
       </div>
     </div>
+
 
     <!-- ADMIN -->
     <!--
@@ -386,7 +358,8 @@ const firebaseConfig = {
   measurementId: "G-CMD346C44P"
 };
 
-let db, photos = {}, chatMsgs = [], state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
+let db, state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
+let chatMessages = [];
 
 try {
   const app = initializeApp(firebaseConfig);
@@ -406,6 +379,7 @@ function listen() {
     if (!state.users) state.users = {};
     setConn('Live — tilkoblet', 'ok');
     document.getElementById('app').style.display = '';
+    attachChatListeners();
     checkNewDay();
     render();
   }, e => { setConn('Tilkoblingsfeil', 'err'); toast('Firebase: ' + e.message, 'e'); });
@@ -429,21 +403,73 @@ function listen() {
     }
   });
 
-  onValue(ref(db, 'photos'), snap => {
-    photos = snap.val() || {};
-    renderPhotos();
-  });
-
   onValue(ref(db, 'chat'), snap => {
-    chatMsgs = [];
+    console.log('[chat-listener] FIRED. exists:', snap.exists());
+    chatMessages = [];
     if (snap.exists()) {
-      snap.forEach(child => chatMsgs.push({ id: child.key, ...child.val() }));
+      const all = [];
+      snap.forEach(child => all.push({ id: child.key, ...child.val() }));
+      chatMessages = all.slice(-200);
+      console.log('[chat-listener] loaded', chatMessages.length, 'messages');
     }
     renderChat();
+    console.log('[chat-listener] renderChat done, el children:', document.getElementById('chat-messages').children.length);
+  }, e => {
+    console.error('[chat-listener] ERROR:', e.message, e.code);
+    toast('Chat-feil: ' + e.message, 'e');
   });
-
 }
 
+// ── Chat send — attached after app is visible ──────────────
+function attachChatListeners() {
+  const btn = document.getElementById('btn-send');
+  const inp = document.getElementById('chat-input');
+  if (btn._chatAttached) return;
+  btn._chatAttached = true;
+  btn.addEventListener('click', sendChat);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+}
+
+async function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim();
+  console.log('[chat] send attempt, text:', text);
+  if (!text) return;
+
+  const k = sel();
+  console.log('[chat] selected key:', k);
+  console.log('[chat] state.users:', JSON.stringify(state.users));
+  if (!k) {
+    toast('⚠ Velg deg selv i nedtrekksmenyen før du sender!', 'e');
+    return;
+  }
+  const u = state.users[k];
+  console.log('[chat] user found:', u);
+  if (!u) { toast('Finner ikke brukeren din.', 'e'); return; }
+
+  inp.value = '';
+  inp.disabled = true;
+  document.getElementById('btn-send').disabled = true;
+
+  try {
+    console.log('[chat] pushing to firebase...');
+    const result = await push(ref(db, 'chat'), {
+      name: u.displayName,
+      userKey: k,
+      text,
+      ts: Date.now()
+    });
+    console.log('[chat] push result:', result.key);
+  } catch(e) {
+    console.error('[chat] push error:', e);
+    toast('Kunne ikke sende: ' + e.message, 'e');
+    inp.value = text;
+  } finally {
+    inp.disabled = false;
+    document.getElementById('btn-send').disabled = false;
+    inp.focus();
+  }
+}
 
 // ── Helpers ─────────────────────────────────────────────────
 function setConn(txt, cls) {
@@ -559,7 +585,7 @@ document.getElementById('user-sel').addEventListener('change', updateBtns);
 
 // ── Render ──────────────────────────────────────────────────
 function render() {
-  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderAllLBs(); renderCounters(); renderPhotos(); renderAdmin();
+  renderSel(); renderPresent(); renderHighlights(); renderLive(); renderAllLBs(); renderCounters(); renderAdmin();
 }
 
 function renderSel() {
@@ -686,6 +712,29 @@ function renderAllLBs() {
   lbAll.innerHTML = allEntries.length ? allEntries.map(lbItem).join('') : emptyMsg();
 }
 
+function renderChat() {
+  const el = document.getElementById('chat-messages');
+  const myKey = sel();
+  const prevCount = el.querySelectorAll('.chat-msg').length;
+  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+
+  if (!chatMessages.length) {
+    el.innerHTML = '<div class="chat-empty">Ingen meldinger ennå. Si hei! 👋</div>';
+    return;
+  }
+
+  el.innerHTML = chatMessages.map(m => {
+    const mine = m.userKey === myKey;
+    return `<div class="chat-msg ${mine ? 'mine' : 'theirs'}">
+      <div class="chat-bubble">${esc(m.text)}</div>
+      <div class="chat-meta">${!mine ? `<span class="chat-sender">${esc(m.name)}</span>` : ''}${fmtT(m.ts)}</div>
+    </div>`;
+  }).join('');
+
+  if (atBottom || chatMessages.length > prevCount || prevCount === 0) {
+    requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+  }
+}
 
 
 
@@ -838,145 +887,6 @@ window.saveQuote = async function() {
   toast(text ? '💬 Quote oppdatert!' : 'Quote fjernet.', 'i');
 };
 
-
-// ── Photos ────────────────────────────────────────────────────
-window.addPhoto = async function() {
-  const urlEl = document.getElementById('photo-url');
-  const capEl = document.getElementById('photo-cap');
-  const url = urlEl.value.trim();
-  if (!url) { toast('Lim inn en bilde-URL først.', 'e'); return; }
-  if (!/^https?:\/\//i.test(url)) { toast('URL må starte med http:// eller https://', 'e'); return; }
-  const k = sel();
-  const addedBy = k && state.users[k] ? state.users[k].displayName : 'Anonym';
-  urlEl.disabled = true;
-  try {
-    await push(ref(db, 'photos'), {
-      url,
-      caption: capEl.value.trim() || null,
-      addedBy,
-      ts: Date.now()
-    });
-    urlEl.value = '';
-    capEl.value = '';
-    toast('📸 Bilde lagt til!', 'i');
-  } catch(e) {
-    toast('Feil: ' + e.message, 'e');
-  } finally {
-    urlEl.disabled = false;
-  }
-};
-
-window.deletePhoto = async function(k) {
-  if (!confirm('Slette dette bildet?')) return;
-  await set(ref(db, 'photos/' + k), null);
-  toast('Bilde slettet.', 'e');
-};
-
-window.openLightbox = function(url) {
-  document.getElementById('lightbox-img').src = url;
-  document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow = 'hidden';
-};
-window.closeLightbox = function() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lightbox-img').src = '';
-  document.body.style.overflow = '';
-};
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
-
-function renderPhotos() {
-  const el = document.getElementById('photo-grid');
-  if (!el) return;
-  const entries = Object.entries(photos).sort((a, b) => (b[1].ts || 0) - (a[1].ts || 0));
-  if (!entries.length) {
-    el.innerHTML = '<div class="muted">Ingen bilder ennå — vær den første! 📸</div>';
-    return;
-  }
-  let html = '';
-  entries.forEach(([k, p]) => {
-    const safeUrl = p.url.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    const label = esc(p.caption || p.addedBy || '');
-    html += '<div class="photo-item" onclick="openLightbox('' + safeUrl + '')">'
-      + '<img src="' + safeUrl + '" alt="' + esc(p.caption || '') + '" loading="lazy" onerror="this.parentElement.style.display='none'">'
-      + (label ? '<div class="photo-meta">' + label + '</div>' : '')
-      + '<button class="photo-del" onclick="event.stopPropagation();deletePhoto('' + k + '')" title="Slett">✕</button>'
-      + '</div>';
-  });
-  el.innerHTML = html;
-}
-
-
-// ── Chat ─────────────────────────────────────────────────────
-window.chatSend = async function() {
-  const inp = document.getElementById('chat-inp');
-  const btn = document.getElementById('chat-btn');
-  const text = (inp.value || '').trim();
-  if (!text) return;
-
-  const k = sel();
-  if (!k || !state.users[k]) {
-    toast('Velg deg selv i nedtrekksmenyen først!', 'e');
-    return;
-  }
-
-  inp.value = '';
-  btn.disabled = true;
-  inp.disabled = true;
-
-  try {
-    await push(ref(db, 'chat'), {
-      uid: k,
-      name: state.users[k].displayName,
-      text: text,
-      ts: Date.now()
-    });
-  } catch(err) {
-    toast('Kunne ikke sende: ' + err.message, 'e');
-    inp.value = text;
-  } finally {
-    btn.disabled = false;
-    inp.disabled = false;
-    inp.focus();
-  }
-};
-
-// Send on Enter
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'chat-inp') {
-    chatSend();
-  }
-});
-
-function renderChat() {
-  const log = document.getElementById('chat-log');
-  if (!log) return;
-
-  const myKey = sel();
-  const wasAtBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 80;
-
-  if (!chatMsgs.length) {
-    log.innerHTML = '<div class="chat-empty-msg">Ingen meldinger ennå — si hei! 👋</div>';
-    return;
-  }
-
-  let html = '';
-  chatMsgs.slice(-200).forEach(function(m) {
-    const mine = m.uid === myKey;
-    const cls = mine ? 'me' : 'them';
-    html += '<div class="cmsg ' + cls + '">';
-    html += '<div class="cbubble">' + esc(m.text) + '</div>';
-    html += '<div class="cmeta">';
-    if (!mine) html += '<span class="csender">' + esc(m.name) + '</span>';
-    html += fmtT(m.ts);
-    html += '</div></div>';
-  });
-  log.innerHTML = html;
-
-  if (wasAtBottom) {
-    requestAnimationFrame(function() { log.scrollTop = log.scrollHeight; });
-  }
-}
-
 // ── Tick ────────────────────────────────────────────────────
 setInterval(() => {
   const now = new Date();
@@ -1007,6 +917,5 @@ function toast(msg, type='') {
   setTimeout(() => t.remove(), 3500);
 }
 </script>
-<div id="lightbox" onclick="closeLightbox()"><button id="lightbox-close" onclick="closeLightbox()">✕</button><img id="lightbox-img" src="" alt=""></div>
 </body>
 </html>
