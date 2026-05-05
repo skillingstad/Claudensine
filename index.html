@@ -34,7 +34,7 @@
   .clock-display { font-family: 'Space Mono', monospace; font-size: clamp(20px, 4vw, 32px); color: var(--accent); font-weight: 700; text-align: right; }
   .date-display { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted2); text-align: right; margin-top: 4px; letter-spacing: 0.1em; }
 
-  /* STATUS */
+/* STATUS */
 #conn-status { display: none !important; }
 .conn-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted2); transition: background 0.3s; }
 .conn-dot.ok { background: var(--accent2); animation: pulse 1.5s ease-in-out infinite; }
@@ -239,16 +239,16 @@
   <div id="exam-banner">
     <div class="exam-blink"></div>
     <div>
-      <div class="exam-text">🚨! EKSAMENSDAG !🚨</div>
+      <div class="exam-text">🚨 !EKSAMENSDAG! 🚨</div>
       <div class="exam-sub" id="exam-sub"></div>
     </div>
   </div>
-  
+
   <div id="conn-status">
     <div class="conn-dot" id="conn-dot"></div>
     <span id="conn-text">Kobler til…</span>
   </div>
-  
+
   <div id="quote-bar">
     <span class="quote-text" id="quote-display"></span>
     <span class="quote-author" id="quote-author-display"></span>
@@ -1031,31 +1031,46 @@ const EXAM_DATES = [
   '2026-06-04'
 ];
 
+function localDateStr() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
+
 function checkExamBanner() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr();
   const banner = document.getElementById('exam-banner');
   const sub = document.getElementById('exam-sub');
+  const dot = banner.querySelector('.exam-blink');
+  const txt = banner.querySelector('.exam-text');
   if (!banner) return;
+
   if (EXAM_DATES.includes(today)) {
-    banner.classList.add('show');
-    // Find next exam after today for sub-text
+    // EXAM DAY — red
+    banner.style.background = 'rgba(255,71,120,0.08)';
+    banner.style.borderColor = 'rgba(255,71,120,0.5)';
+    if (dot) dot.style.background = 'var(--accent3)';
+    if (txt) { txt.style.color = 'var(--accent3)'; txt.textContent = '🚨 EKSAMEN I DAG — LYK TIL ALLE!'; }
     const upcoming = EXAM_DATES.filter(d => d > today);
     sub.textContent = upcoming.length
       ? 'Neste eksamen: ' + fmtDate(upcoming[0])
-      : 'Dette er siste eksamen — dere er snart ferdige!';
+      : 'Dette er siste eksamen — dere er snart ferdige! 🎉';
+    banner.classList.add('show');
   } else {
-    banner.classList.remove('show');
-    // Show upcoming exam as info
-    const next = EXAM_DATES.find(d => d >= today);
+    // UPCOMING — yellow
+    const next = EXAM_DATES.find(d => d > today);
     if (next) {
-      banner.classList.add('show');
       banner.style.background = 'rgba(232,255,71,0.05)';
       banner.style.borderColor = 'rgba(232,255,71,0.2)';
-      const dot = banner.querySelector('.exam-blink');
       if (dot) dot.style.background = 'var(--accent)';
-      const txt = banner.querySelector('.exam-text');
-      if (txt) { txt.style.color = 'var(--accent)'; txt.textContent = 'Neste eksamen: ' + fmtDate(next); }
-      sub.textContent = daysUntil(next) === 1 ? '— I morgen!' : '— Om ' + daysUntil(next) + ' dager';
+      if (txt) { txt.style.color = 'var(--accent)'; txt.textContent = '📅 Neste eksamen: ' + fmtDate(next); }
+      const days = daysUntil(next);
+      sub.textContent = days === 1 ? '— I morgen!' : days === 0 ? '— I dag!' : '— Om ' + days + ' dager';
+      banner.classList.add('show');
+    } else {
+      banner.classList.remove('show');
     }
   }
 }
@@ -1065,9 +1080,9 @@ function fmtDate(iso) {
 }
 
 function daysUntil(iso) {
-  const today = new Date(); today.setHours(0,0,0,0);
+  const now = new Date(); now.setHours(0,0,0,0);
   const target = new Date(iso + 'T00:00:00');
-  return Math.round((target - today) / 86400000);
+  return Math.round((target - now) / 86400000);
 }
 
 checkExamBanner();
