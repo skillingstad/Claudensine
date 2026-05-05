@@ -35,10 +35,10 @@
   .date-display { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted2); text-align: right; margin-top: 4px; letter-spacing: 0.1em; }
 
   /* STATUS */
-  #conn-status { display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-size: 11px; padding: 7px 14px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); margin-bottom: 28px; }
-  .conn-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted2); transition: background 0.3s; }
-  .conn-dot.ok { background: var(--accent2); animation: pulse 1.5s ease-in-out infinite; }
-  .conn-dot.err { background: var(--accent3); }
+#conn-status { display: none !important; }
+.conn-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted2); transition: background 0.3s; }
+.conn-dot.ok { background: var(--accent2); animation: pulse 1.5s ease-in-out infinite; }
+.conn-dot.err { background: var(--accent3); }
 
   /* CARDS */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
@@ -243,12 +243,12 @@
       <div class="exam-sub" id="exam-sub"></div>
     </div>
   </div>
-  <!--
+  
   <div id="conn-status">
     <div class="conn-dot" id="conn-dot"></div>
     <span id="conn-text">Kobler til…</span>
   </div>
-  -->
+  
   <div id="quote-bar">
     <span class="quote-text" id="quote-display"></span>
     <span class="quote-author" id="quote-author-display"></span>
