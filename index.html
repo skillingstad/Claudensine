@@ -156,6 +156,16 @@
   .tag-pause { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: #f5a623; }
   .pause-dot { display: inline-block; width: 7px; height: 7px; background: #C4A484; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
 
+
+  /* SKAMMEKROK */
+  .btn-shame { background: #4b1f1f; color: #fff; padding: 12px 20px; font-size: 13px; font-family: Syne,sans-serif; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase; transition: transform 0.1s, box-shadow 0.2s; }
+  .btn-shame:not(:disabled):hover { box-shadow: 0 0 20px rgba(211,51,51,0.35); }
+  .btn-shame:active { transform: scale(0.97); }
+  .btn-shame.active-shame { background: var(--accent3); color: #fff; }
+  .btn-shame:disabled { opacity: 0.35; cursor: not-allowed; }
+  .tag-shame { background: rgba(211,51,51,0.1); border: 1px solid rgba(211,51,51,0.3); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: var(--accent3); }
+  .shame-dot { display: inline-block; width: 7px; height: 7px; background: var(--accent3); border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; vertical-align: middle; }
+
   /* QUOTE */
   #quote-bar { display: none; align-items: center; gap: 10px; margin-top: 10px; margin-bottom: 20px; flex-wrap: wrap; }
   #quote-bar.visible { display: flex; }
@@ -283,6 +293,7 @@
         <select id="user-sel"><option value="">— Velg deg selv —</option></select>
         <button class="btn-cyan" id="btn-in" onclick="arrive()" disabled>Locked in</button>
         <button class="btn-pause" id="btn-pause" onclick="togglePause()" disabled>Lokepause </button>
+        <button class="btn-shame" id="btn-shame" onclick="toggleShame()" disabled>Skammekrok</button>
         <button class="btn-red" id="btn-out" onclick="leave()" disabled>Locked out</button>
       </div>
       <div class="row" style="margin-top:12px">
@@ -302,6 +313,13 @@
     <div class="card" id="pause-section" style="display:none">
       <div class="card-title">Lokere </div>
       <div class="tags" id="pause-now"></div>
+    </div>
+
+    <!-- SHAME CORNER -->
+    <div class="card" id="shame-section" style="display:none">
+      <div class="card-title">Skammekrok</div>
+      <div class="tags" id="shame-now"></div>
+      <div class="penalty-note">🚨 For å komme ut av skammekroken må man skrive: <strong>Jeg skal skjerpe meg</strong></div>
     </div>
 
     <!-- HIGHLIGHTS -->
@@ -521,6 +539,7 @@ async function checkNewDay() {
     if (u.active) {
       ups[`studytrack/users/${k}/active`] = null;
       ups[`studytrack/users/${k}/paused`] = null;
+      ups[`studytrack/users/${k}/shamed`] = null;
       ups[`studytrack/users/${k}/penalty`] = (u.penalty || 0) + 30 * 60 * 1000;
       pen = true;
     }
@@ -538,7 +557,7 @@ window.registerUser = async function() {
   if (state.users[k]) { toast(`"${name}" er allerede registrert!`, 'e'); return; }
   await set(ref(db, `studytrack/users/${k}`), {
     displayName: name, totalMs: 0, todayMs: 0, weekMs: 0,
-    penalty: 0, sessionCount: 0, active: null,
+    penalty: 0, sessionCount: 0, active: null, paused: null, shamed: null,
     lastActiveDate: todayStr(), lastActiveWeek: weekStart()
   });
   inp.value = '';
@@ -561,6 +580,7 @@ window.leave = async function() {
   const k = sel(); if (!k) return;
   const u = state.users[k];
   if (!u.active) { toast(`${u.displayName} er ikke inne!`, 'e'); return; }
+  if (u.shamed && !confirmShameExit(u.displayName)) return;
   const now = Date.now();
   const ms = now - u.active;
   const today = todayStr();
@@ -575,6 +595,7 @@ window.leave = async function() {
   await update(ref(db), {
     [`studytrack/users/${k}/active`]: null,
     [`studytrack/users/${k}/paused`]: null,
+    [`studytrack/users/${k}/shamed`]: null,
     [`studytrack/users/${k}/totalMs`]: (u.totalMs || 0) + ms,
     [`studytrack/users/${k}/todayMs`]: todayAdd,
     [`studytrack/users/${k}/weekMs`]: weekAdd,
@@ -593,6 +614,23 @@ window.togglePause = async function() {
   const nowPaused = !u.paused;
   await update(ref(db), { [`studytrack/users/${k}/paused`]: nowPaused });
   toast(nowPaused ? `${u.displayName} loker` : `${u.displayName} er tilbake! `, 'i');
+};
+
+function confirmShameExit(name) {
+  const answer = prompt(`${name} er i skammekroken. Skriv nøyaktig: Jeg skal skjerpe meg`);
+  if (answer === 'Jeg skal skjerpe meg') return true;
+  if (answer !== null) toast('Feil tekst. Du blir værende i skammekroken.', 'e');
+  return false;
+}
+
+window.toggleShame = async function() {
+  const k = sel(); if (!k) return;
+  const u = state.users[k];
+  if (!u || !u.active) { toast('Du må være sjekket inn først!', 'e'); return; }
+  const nowShamed = !u.shamed;
+  if (!nowShamed && !confirmShameExit(u.displayName)) return;
+  await update(ref(db), { [`studytrack/users/${k}/shamed`]: nowShamed });
+  toast(nowShamed ? `${u.displayName} er sendt i skammekroken 😬` : `${u.displayName} slapp ut av skammekroken.`, 'i');
 };
 
 window.setStatus = async function() {
@@ -632,8 +670,10 @@ function updateBtns() {
   const k = sel(), u = k && state.users[k];
   const isActive = u && !!u.active;
   const isPaused = u && !!u.paused;
+  const isShamed = u && !!u.shamed;
   document.getElementById('btn-in').disabled = !u || isActive;
   document.getElementById('btn-pause').disabled = !u || !isActive;
+  document.getElementById('btn-shame').disabled = !u || !isActive;
   document.getElementById('btn-out').disabled = !u || !isActive;
   const pauseBtn = document.getElementById('btn-pause');
   if (isPaused) {
@@ -643,11 +683,20 @@ function updateBtns() {
     pauseBtn.textContent = 'Lokepause';
     pauseBtn.classList.remove('active-pause');
   }
+
+  const shameBtn = document.getElementById('btn-shame');
+  if (isShamed) {
+    shameBtn.textContent = 'Ut av skammekrok';
+    shameBtn.classList.add('active-shame');
+  } else {
+    shameBtn.textContent = 'Skammekrok';
+    shameBtn.classList.remove('active-shame');
+  }
 }
 
 function renderPresent() {
   const el = document.getElementById('present-now');
-  const here = Object.values(state.users || {}).filter(u => u.active && !u.paused);
+  const here = Object.values(state.users || {}).filter(u => u.active && !u.paused && !u.shamed);
   el.innerHTML = here.length
     ? here.map(u => `<span class="tag"><span class="pulse-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('')
     : '<span class="muted">Ingen jobber akkurat nå.</span>';
@@ -661,6 +710,17 @@ function renderPresent() {
     pauseEl.innerHTML = onPause.map(u => `<span class="tag-pause"><span class="pause-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('');
   } else {
     pauseSec.style.display = 'none';
+  }
+
+  // Shame corner section
+  const inShame = Object.values(state.users || {}).filter(u => u.active && u.shamed);
+  const shameSec = document.getElementById('shame-section');
+  const shameEl = document.getElementById('shame-now');
+  if (inShame.length) {
+    shameSec.style.display = '';
+    shameEl.innerHTML = inShame.map(u => `<span class="tag-shame"><span class="shame-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('');
+  } else {
+    shameSec.style.display = 'none';
   }
 }
 
