@@ -1138,7 +1138,7 @@ function checkExamBanner() {
       banner.style.background = 'rgba(232,255,71,0.05)';
       banner.style.borderColor = 'rgba(232,255,71,0.2)';
       if (dot) dot.style.background = 'var(--accent)';
-      if (txt) { txt.style.color = 'var(--accent)'; txt.textContent = '📅 Neste eksamen: ' + fmtDate(next); }
+      if (txt) { txt.style.color = 'var(--accent)'; txt.textContent = ' Neste eksamen: ' + fmtDate(next); }
       const days = daysUntil(next);
       sub.textContent = days === 1 ? '— I morgen!' : days === 0 ? '— I dag!' : '— Om ' + days + ' dager';
       banner.classList.add('show');
