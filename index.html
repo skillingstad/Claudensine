@@ -749,7 +749,7 @@ function renderLive() {
     html += '<div class="live-card">';
     html += '<div class="live-name">' + esc(u.displayName) + '</div>';
     html += '<div class="live-since">Siden ' + fmtT(u.active) + '</div>';
-    if (u.paused) html += '<div class="status-badge" style="background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3);color:#f5a623">\u2615 Pause</div>';
+    if (u.paused) html += '<div class="status-badge" style="background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3);color:#f5a623">\u2615 Loker</div>';
     if (u.status) html += '<div class="status-badge">\ud83d\udcac ' + esc(u.status) + '</div>';
     html += '<div class="live-dur">' + dur(now - u.active) + '</div>';
     html += '</div>';
