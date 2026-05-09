@@ -232,6 +232,65 @@
   .exam-text { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent3); font-weight: 700; letter-spacing: 0.05em; }
   .exam-sub { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); letter-spacing: 0.1em; margin-top: 2px; }
   @keyframes examBlink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
+
+  /* POLL */
+  .poll-setup { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .poll-setup-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .poll-options-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .poll-divider { font-family: Space Mono,monospace; font-size: 11px; color: var(--muted2); align-self: center; }
+
+  .poll-question-display { font-size: 20px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.01em; }
+  .poll-alts { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .poll-vote-btn {
+    flex: 1; min-width: 120px; padding: 14px 20px; border-radius: 10px; border: 2px solid var(--border);
+    background: var(--surface2); color: var(--text); font-family: Syne,sans-serif; font-weight: 700;
+    font-size: 15px; cursor: pointer; transition: all 0.15s; text-align: center;
+  }
+  .poll-vote-btn:hover { border-color: var(--accent); }
+  .poll-vote-btn.voted-a { border-color: var(--accent2); background: rgba(71,255,232,0.1); color: var(--accent2); }
+  .poll-vote-btn.voted-b { border-color: var(--accent3); background: rgba(255,71,120,0.1); color: var(--accent3); }
+  .poll-vote-btn:disabled { cursor: not-allowed; }
+
+  /* CHESS BAR */
+  .chess-bar-wrap { margin: 8px 0 18px 0; }
+  .chess-bar-labels { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .chess-bar-label { font-family: Space Mono,monospace; font-size: 11px; font-weight: 700; }
+  .chess-bar-label.a { color: var(--accent2); }
+  .chess-bar-label.b { color: var(--accent3); }
+  .chess-bar-outer {
+    position: relative; height: 28px; background: var(--surface2);
+    border-radius: 14px; overflow: visible; border: 1px solid var(--border);
+  }
+  .chess-bar-a {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: var(--accent2); border-radius: 14px 0 0 14px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    opacity: 0.3;
+  }
+  .chess-bar-b {
+    position: absolute; right: 0; top: 0; bottom: 0;
+    background: var(--accent3); border-radius: 0 14px 14px 0;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    opacity: 0.3;
+  }
+  .chess-arrow {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 36px; height: 36px; background: var(--text); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900; color: var(--bg);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    transition: left 0.6s cubic-bezier(0.4,0,0.2,1);
+    z-index: 2; border: 3px solid var(--bg);
+    font-family: Space Mono,monospace;
+  }
+  .chess-bar-counts { display: flex; justify-content: space-between; margin-top: 6px; }
+  .chess-bar-count { font-family: Space Mono,monospace; font-size: 12px; color: var(--muted2); }
+  .poll-voted-info { font-family: Space Mono,monospace; font-size: 11px; color: var(--muted2); margin-top: 8px; text-align: center; }
+  .poll-no-votes { font-family: Space Mono,monospace; font-size: 11px; color: var(--muted2); text-align: center; padding: 12px 0; }
+  .btn-change-poll { background: transparent; border: 1px solid var(--border); color: var(--muted2); font-size: 10px; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: Space Mono,monospace; margin-top: 12px; }
+  .btn-change-poll:hover { border-color: var(--accent); color: var(--accent); }
+  #poll-edit-area { display: none; margin-top: 14px; }
+  #poll-edit-area.open { display: block; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -363,6 +422,29 @@
       </div>
     </div>
 
+    <!-- POLL -->
+    <div class="card" id="poll-card">
+      <div class="card-title">Dagens demokrati 🗳</div>
+      <div id="poll-body">
+        <div class="poll-no-votes" style="padding:24px 0">Ingen avstemning satt ennå.</div>
+      </div>
+      <button class="btn-change-poll" onclick="togglePollEdit()">✏ Endre spørsmål</button>
+      <div id="poll-edit-area">
+        <div class="poll-setup" style="margin-top:12px">
+          <input type="text" id="poll-q-input" placeholder="Spørsmål... (f.eks. 'Er kaffe bedre enn pils?')" maxlength="80">
+          <div class="poll-options-row">
+            <input type="text" id="poll-a-input" placeholder="Alternativ A" maxlength="40" style="flex:1">
+            <span class="poll-divider">vs</span>
+            <input type="text" id="poll-b-input" placeholder="Alternativ B" maxlength="40" style="flex:1">
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn-yellow" onclick="savePoll()">Start avstemning</button>
+            <button class="btn-change-poll" onclick="togglePollEdit()">Avbryt</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- COUNTERS -->
     <div class="card">
       <div class="card-title">Kaffekanner &amp; Pils på Loftet ☕🍺</div>
@@ -454,7 +536,7 @@ const firebaseConfig = {
   measurementId: "G-CMD346C44P"
 };
 
-let db, photos = {}, chatMsgs = [], state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
+let db, photos = {}, chatMsgs = [], pollData = null, state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
 
 try {
   const app = initializeApp(firebaseConfig);
@@ -500,6 +582,11 @@ function listen() {
   onValue(ref(db, 'photos'), snap => {
     photos = snap.val() || {};
     renderPhotos();
+  });
+
+  onValue(ref(db, 'poll'), snap => {
+    pollData = snap.val();
+    renderPoll();
   });
 
   onValue(ref(db, 'chat'), snap => {
@@ -618,7 +705,7 @@ window.togglePause = async function() {
 
 function confirmShameExit(name) {
   const answer = prompt(`${name} er i skammekroken. Skriv inn koden:`);
-  if (answer === 'Koden') return true;
+  if (answer === 'koden') return true;
   if (answer !== null) toast('Feil tekst. Du blir værende i skammekroken.', 'e');
   return false;
 }
@@ -749,7 +836,7 @@ function renderLive() {
     html += '<div class="live-card">';
     html += '<div class="live-name">' + esc(u.displayName) + '</div>';
     html += '<div class="live-since">Siden ' + fmtT(u.active) + '</div>';
-    if (u.paused) html += '<div class="status-badge" style="background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3);color:#f5a623">\u2615 Loker</div>';
+    if (u.paused) html += '<div class="status-badge" style="background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3);color:#f5a623">\u2615 Pause</div>';
     if (u.status) html += '<div class="status-badge">\ud83d\udcac ' + esc(u.status) + '</div>';
     html += '<div class="live-dur">' + dur(now - u.active) + '</div>';
     html += '</div>';
@@ -1166,6 +1253,100 @@ function daysUntil(iso) {
 }
 
 checkExamBanner();
+
+
+// ── Poll ──────────────────────────────────────────────────────
+window.togglePollEdit = function() {
+  const area = document.getElementById('poll-edit-area');
+  area.classList.toggle('open');
+  if (area.classList.contains('open') && pollData) {
+    document.getElementById('poll-q-input').value = pollData.question || '';
+    document.getElementById('poll-a-input').value = pollData.optA || '';
+    document.getElementById('poll-b-input').value = pollData.optB || '';
+  }
+};
+
+window.savePoll = async function() {
+  const q = document.getElementById('poll-q-input').value.trim();
+  const a = document.getElementById('poll-a-input').value.trim();
+  const b = document.getElementById('poll-b-input').value.trim();
+  if (!q || !a || !b) { toast('Fyll inn spørsmål og begge alternativer.', 'e'); return; }
+  // If question changed, wipe votes
+  const newPoll = { question: q, optA: a, optB: b, votes: {} };
+  if (pollData && pollData.question === q) {
+    newPoll.votes = pollData.votes || {};
+  }
+  await set(ref(db, 'poll'), newPoll);
+  document.getElementById('poll-edit-area').classList.remove('open');
+  toast('🗳 Avstemning startet!', 'i');
+};
+
+window.castVote = async function(side) {
+  const k = sel();
+  if (!k) { toast('Velg deg selv i nedtrekksmenyen først!', 'e'); return; }
+  if (!pollData) return;
+  // Toggle off if same vote
+  const current = pollData.votes && pollData.votes[k];
+  const newVote = current === side ? null : side;
+  await update(ref(db, 'poll/votes'), { [k]: newVote });
+};
+
+function renderPoll() {
+  const body = document.getElementById('poll-body');
+  if (!body) return;
+  if (!pollData || !pollData.question) {
+    body.innerHTML = '<div class="poll-no-votes" style="padding:24px 0">Ingen avstemning satt ennå.</div>';
+    return;
+  }
+
+  const myKey = sel();
+  const votes = pollData.votes || {};
+  const myVote = myKey ? votes[myKey] : null;
+
+  // Count votes
+  let countA = 0, countB = 0, votersA = [], votersB = [];
+  Object.entries(votes).forEach(([k, v]) => {
+    const name = state.users[k] ? state.users[k].displayName : k;
+    if (v === 'a') { countA++; votersA.push(name); }
+    if (v === 'b') { countB++; votersB.push(name); }
+  });
+  const total = countA + countB;
+
+  // Arrow position: 50% = tie, 0% = all B, 100% = all A
+  const pct = total === 0 ? 50 : Math.round((countA / total) * 100);
+  const arrowPct = pct; // left position of arrow
+
+  // Arrow label
+  let arrowLabel = '=';
+  if (pct > 50) arrowLabel = '▶';
+  else if (pct < 50) arrowLabel = '◀';
+
+  body.innerHTML =
+    '<div class="poll-question-display">' + esc(pollData.question) + '</div>'
+    + '<div class="poll-alts">'
+    + '<button class="poll-vote-btn' + (myVote === 'a' ? ' voted-a' : '') + '" onclick="castVote('a')">'
+    + esc(pollData.optA) + '</button>'
+    + '<button class="poll-vote-btn' + (myVote === 'b' ? ' voted-b' : '') + '" onclick="castVote('b')">'
+    + esc(pollData.optB) + '</button>'
+    + '</div>'
+    + '<div class="chess-bar-wrap">'
+    + '<div class="chess-bar-labels">'
+    + '<span class="chess-bar-label a">' + esc(pollData.optA) + ' (' + countA + ')</span>'
+    + '<span class="chess-bar-label b">' + esc(pollData.optB) + ' (' + countB + ')</span>'
+    + '</div>'
+    + '<div class="chess-bar-outer">'
+    + '<div class="chess-bar-a" style="width:' + pct + '%"></div>'
+    + '<div class="chess-bar-b" style="width:' + (100 - pct) + '%"></div>'
+    + '<div class="chess-arrow" style="left:' + arrowPct + '%">' + arrowLabel + '</div>'
+    + '</div>'
+    + '</div>'
+    + (total === 0
+      ? '<div class="poll-no-votes">Ingen har stemt ennå — vær den første!</div>'
+      : '<div class="poll-voted-info">'
+        + (votersA.length ? esc(pollData.optA) + ': ' + votersA.join(', ') + '<br>' : '')
+        + (votersB.length ? esc(pollData.optB) + ': ' + votersB.join(', ') : '')
+        + '</div>');
+}
 
 // ── Tick ────────────────────────────────────────────────────
 setInterval(() => {
