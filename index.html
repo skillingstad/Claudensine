@@ -737,17 +737,24 @@ function renderHighlights() {
 }
 
 function renderLive() {
-  const active = Object.values(state.users || {}).filter(u => u.active);
+  const now = Date.now();
+  const active = Object.values(state.users || {})
+    .filter(u => u.active)
+    .sort((a, b) => a.active - b.active); // earliest check-in first = longest session
   const sec = document.getElementById('live-section');
   if (!active.length) { sec.style.display = 'none'; return; }
   sec.style.display = '';
-  document.getElementById('live-grid').innerHTML = active.map(u => `
-    <div class="live-card">
-      <div class="live-name">${esc(u.displayName)}</div>
-      <div class="live-since">Siden ${fmtT(u.active)}</div>
-      ${u.status ? `<div class="status-badge">💬 ${esc(u.status)}</div>` : ''}
-      <div class="live-dur">${dur(Date.now() - u.active)}</div>
-    </div>`).join('');
+  let html = '';
+  active.forEach(function(u) {
+    html += '<div class="live-card">';
+    html += '<div class="live-name">' + esc(u.displayName) + '</div>';
+    html += '<div class="live-since">Siden ' + fmtT(u.active) + '</div>';
+    if (u.paused) html += '<div class="status-badge" style="background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3);color:#f5a623">\u2615 Pause</div>';
+    if (u.status) html += '<div class="status-badge">\ud83d\udcac ' + esc(u.status) + '</div>';
+    html += '<div class="live-dur">' + dur(now - u.active) + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('live-grid').innerHTML = html;
 }
 
 function renderAllLBs() {
