@@ -346,6 +346,26 @@
       <!-- <div class="penalty-note">🚨 For å komme ut av skammekroken må man skrive: <strong>Jeg skal skjerpe meg</strong></div> -->
     </div>
 
+        <!-- POLL -->
+    <div class="card">
+      <div class="card-title">Dagens demokrati 🗳</div>
+      <div id="poll-display"><div class="poll-empty">Ingen avstemning ennå.</div></div>
+      <button class="poll-edit-toggle" onclick="pollToggleEdit()">✏ Sett spørsmål</button>
+      <div class="poll-edit-box" id="poll-edit-box">
+        <div class="row">
+          <input type="text" id="poll-q" placeholder="Spørsmålet..." maxlength="80">
+        </div>
+        <div class="row" style="display:flex;gap:10px">
+          <input type="text" id="poll-a" placeholder="Alternativ A" maxlength="40" style="flex:1">
+          <input type="text" id="poll-b" placeholder="Alternativ B" maxlength="40" style="flex:1">
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-yellow" onclick="pollSave()">Start</button>
+          <button class="poll-edit-toggle" onclick="pollToggleEdit()">Avbryt</button>
+        </div>
+      </div>
+    </div>
+
     <!-- HIGHLIGHTS -->
     <div class="card">
       <div class="card-title">Dagens høydepunkter</div>
@@ -387,25 +407,7 @@
       </div>
     </div>
 
-    <!-- POLL -->
-    <div class="card">
-      <div class="card-title">Dagens demokrati 🗳</div>
-      <div id="poll-display"><div class="poll-empty">Ingen avstemning ennå.</div></div>
-      <button class="poll-edit-toggle" onclick="pollToggleEdit()">✏ Sett spørsmål</button>
-      <div class="poll-edit-box" id="poll-edit-box">
-        <div class="row">
-          <input type="text" id="poll-q" placeholder="Spørsmålet..." maxlength="80">
-        </div>
-        <div class="row" style="display:flex;gap:10px">
-          <input type="text" id="poll-a" placeholder="Alternativ A" maxlength="40" style="flex:1">
-          <input type="text" id="poll-b" placeholder="Alternativ B" maxlength="40" style="flex:1">
-        </div>
-        <div style="display:flex;gap:10px">
-          <button class="btn-yellow" onclick="pollSave()">Start</button>
-          <button class="poll-edit-toggle" onclick="pollToggleEdit()">Avbryt</button>
-        </div>
-      </div>
-    </div>
+
 
     <!-- COUNTERS -->
     <div class="card">
@@ -1012,75 +1014,6 @@ window.saveQuote = async function() {
   toast(text ? '💬 Quote oppdatert!' : 'Quote fjernet.', 'i');
 };
 
-
-// ── Photos ────────────────────────────────────────────────────
-/*
-window.addPhoto = async function() {
-  const urlEl = document.getElementById('photo-url');
-  const capEl = document.getElementById('photo-cap');
-  const url = urlEl.value.trim();
-  if (!url) { toast('Lim inn en bilde-URL først.', 'e'); return; }
-  if (!/^https?:\/\//i.test(url)) { toast('URL må starte med http:// eller https://', 'e'); return; }
-  const k = sel();
-  const addedBy = k && state.users[k] ? state.users[k].displayName : 'Anonym';
-  urlEl.disabled = true;
-  try {
-    await push(ref(db, 'photos'), {
-      url,
-      caption: capEl.value.trim() || null,
-      addedBy,
-      ts: Date.now()
-    });
-    urlEl.value = '';
-    capEl.value = '';
-    toast('📸 Bilde lagt til!', 'i');
-  } catch(e) {
-    toast('Feil: ' + e.message, 'e');
-  } finally {
-    urlEl.disabled = false;
-  }
-};
-
-window.deletePhoto = async function(k) {
-  if (!confirm('Slette dette bildet?')) return;
-  await set(ref(db, 'photos/' + k), null);
-  toast('Bilde slettet.', 'e');
-};
-
-window.openLightbox = function(url) {
-  document.getElementById('lightbox-img').src = url;
-  document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow = 'hidden';
-};
-window.closeLightbox = function() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lightbox-img').src = '';
-  document.body.style.overflow = '';
-};
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
-
-function renderPhotos() {
-  const el = document.getElementById('photo-grid');
-  if (!el) return;
-  const entries = Object.entries(photos).sort((a, b) => (b[1].ts || 0) - (a[1].ts || 0));
-  if (!entries.length) {
-    el.innerHTML = '<div class="muted">Ingen bilder ennå — vær den første! 📸</div>';
-    return;
-  }
-  let html = '';
-  entries.forEach(([k, p]) => {
-    const safeUrl = p.url.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    const label = esc(p.caption || p.addedBy || '');
-    html += '<div class="photo-item" onclick="openLightbox('' + safeUrl + '')">'
-      + '<img src="' + safeUrl + '" alt="' + esc(p.caption || '') + '" loading="lazy" onerror="this.parentElement.style.display='none'">'
-      + (label ? '<div class="photo-meta">' + label + '</div>' : '')
-      + '<button class="photo-del" onclick="event.stopPropagation();deletePhoto('' + k + '')" title="Slett">✕</button>'
-      + '</div>';
-  });
-  el.innerHTML = html;
-}
-
-*/
 // ── Chat ─────────────────────────────────────────────────────
 window.chatSend = async function() {
   const inp = document.getElementById('chat-inp');
