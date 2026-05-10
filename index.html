@@ -232,6 +232,30 @@
   .exam-text { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent3); font-weight: 700; letter-spacing: 0.05em; }
   .exam-sub { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); letter-spacing: 0.1em; margin-top: 2px; }
   @keyframes examBlink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
+
+
+  /* POLL */
+  .poll-q { font-size: 19px; font-weight: 800; margin-bottom: 18px; letter-spacing: -0.01em; }
+  .poll-btns { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .poll-btn { flex: 1; min-width: 110px; padding: 13px 16px; border-radius: 10px; border: 2px solid var(--border); background: var(--surface2); color: var(--text); font-family: Syne,sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .poll-btn:hover { border-color: var(--accent); }
+  .poll-btn.sel-a { border-color: var(--accent2); background: rgba(71,255,232,0.1); color: var(--accent2); }
+  .poll-btn.sel-b { border-color: var(--accent3); background: rgba(255,71,120,0.1); color: var(--accent3); }
+  .poll-bar-wrap { margin-bottom: 10px; }
+  .poll-bar-labels { display: flex; justify-content: space-between; margin-bottom: 6px; font-family: Space Mono,monospace; font-size: 11px; font-weight: 700; }
+  .poll-bar-labels span.la { color: var(--accent2); }
+  .poll-bar-labels span.lb { color: var(--accent3); }
+  .poll-bar-track { position: relative; height: 30px; background: var(--surface2); border-radius: 15px; border: 1px solid var(--border); overflow: visible; }
+  .poll-bar-fill-a { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(71,255,232,0.25); border-radius: 15px 0 0 15px; transition: width 0.5s ease; }
+  .poll-bar-fill-b { position: absolute; right: 0; top: 0; bottom: 0; background: rgba(255,71,120,0.25); border-radius: 0 15px 15px 0; transition: width 0.5s ease; }
+  .poll-arrow { position: absolute; top: 50%; width: 34px; height: 34px; border-radius: 50%; background: var(--text); color: var(--bg); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 12px; font-family: Space Mono,monospace; transform: translate(-50%, -50%); transition: left 0.5s ease; z-index: 3; border: 3px solid var(--bg); box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+  .poll-voters { font-family: Space Mono,monospace; font-size: 10px; color: var(--muted2); line-height: 1.8; margin-top: 10px; }
+  .poll-empty { font-family: Space Mono,monospace; font-size: 11px; color: var(--muted2); text-align: center; padding: 20px 0; }
+  .poll-edit-toggle { background: transparent; border: 1px solid var(--border); color: var(--muted2); font-size: 10px; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: Space Mono,monospace; margin-top: 14px; display: block; }
+  .poll-edit-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .poll-edit-box { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .poll-edit-box.open { display: block; }
+  .poll-edit-box .row { margin-bottom: 10px; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -363,6 +387,26 @@
       </div>
     </div>
 
+    <!-- POLL -->
+    <div class="card">
+      <div class="card-title">Dagens demokrati 🗳</div>
+      <div id="poll-display"><div class="poll-empty">Ingen avstemning ennå.</div></div>
+      <button class="poll-edit-toggle" onclick="pollToggleEdit()">✏ Sett spørsmål</button>
+      <div class="poll-edit-box" id="poll-edit-box">
+        <div class="row">
+          <input type="text" id="poll-q" placeholder="Spørsmålet..." maxlength="80">
+        </div>
+        <div class="row" style="display:flex;gap:10px">
+          <input type="text" id="poll-a" placeholder="Alternativ A" maxlength="40" style="flex:1">
+          <input type="text" id="poll-b" placeholder="Alternativ B" maxlength="40" style="flex:1">
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-yellow" onclick="pollSave()">Start</button>
+          <button class="poll-edit-toggle" onclick="pollToggleEdit()">Avbryt</button>
+        </div>
+      </div>
+    </div>
+
     <!-- COUNTERS -->
     <div class="card">
       <div class="card-title">Kaffekanner &amp; Pils på Loftet ☕🍺</div>
@@ -454,7 +498,7 @@ const firebaseConfig = {
   measurementId: "G-CMD346C44P"
 };
 
-let db, photos = {}, chatMsgs = [], state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
+let db, photos = {}, chatMsgs = [], pollSnap = null, state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
 
 try {
   const app = initializeApp(firebaseConfig);
@@ -500,6 +544,11 @@ function listen() {
   onValue(ref(db, 'photos'), snap => {
     photos = snap.val() || {};
     renderPhotos();
+  });
+
+  onValue(ref(db, 'poll'), function(snap) {
+    pollSnap = snap.val();
+    renderPoll();
   });
 
   onValue(ref(db, 'chat'), snap => {
@@ -618,7 +667,7 @@ window.togglePause = async function() {
 
 function confirmShameExit(name) {
   const answer = prompt(`${name} er i skammekroken. Skriv inn koden:`);
-  if (answer === 'Koden') return true;
+  if (answer === 'koden') return true;
   if (answer !== null) toast('Feil tekst. Du blir værende i skammekroken.', 'e');
   return false;
 }
@@ -749,7 +798,7 @@ function renderLive() {
     html += '<div class="live-card">';
     html += '<div class="live-name">' + esc(u.displayName) + '</div>';
     html += '<div class="live-since">Siden ' + fmtT(u.active) + '</div>';
-    if (u.paused) html += '<div class="status-badge" style="background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3);color:#f5a623">\u2615 Loker</div>';
+    if (u.paused) html += '<div class="status-badge" style="background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3);color:#f5a623">\u2615 Pause</div>';
     if (u.status) html += '<div class="status-badge">\ud83d\udcac ' + esc(u.status) + '</div>';
     html += '<div class="live-dur">' + dur(now - u.active) + '</div>';
     html += '</div>';
@@ -1166,6 +1215,93 @@ function daysUntil(iso) {
 }
 
 checkExamBanner();
+
+
+
+// ── Poll ─────────────────────────────────────────────────────
+window.pollToggleEdit = function() {
+  var box = document.getElementById('poll-edit-box');
+  box.classList.toggle('open');
+  if (box.classList.contains('open') && pollSnap) {
+    document.getElementById('poll-q').value = pollSnap.question || '';
+    document.getElementById('poll-a').value = pollSnap.optA || '';
+    document.getElementById('poll-b').value = pollSnap.optB || '';
+  }
+};
+
+window.pollSave = async function() {
+  var q = document.getElementById('poll-q').value.trim();
+  var a = document.getElementById('poll-a').value.trim();
+  var b = document.getElementById('poll-b').value.trim();
+  if (!q || !a || !b) { toast('Fyll inn alle feltene.', 'e'); return; }
+  var keepVotes = pollSnap && pollSnap.question === q ? (pollSnap.votes || {}) : {};
+  await set(ref(db, 'poll'), { question: q, optA: a, optB: b, votes: keepVotes });
+  document.getElementById('poll-edit-box').classList.remove('open');
+  toast('Avstemning startet! 🗳', 'i');
+};
+
+window.pollVote = async function(side) {
+  var k = sel();
+  if (!k) { toast('Velg deg selv i nedtrekksmenyen først!', 'e'); return; }
+  if (!pollSnap) return;
+  var current = pollSnap.votes && pollSnap.votes[k];
+  var val = (current === side) ? null : side;
+  var upd = {};
+  upd[k] = val;
+  await update(ref(db, 'poll/votes'), upd);
+};
+
+function renderPoll() {
+  var el = document.getElementById('poll-display');
+  if (!el) return;
+  if (!pollSnap || !pollSnap.question) {
+    el.innerHTML = '<div class="poll-empty">Ingen avstemning ennå.</div>';
+    return;
+  }
+
+  var myKey = sel();
+  var votes = pollSnap.votes || {};
+  var myVote = myKey ? (votes[myKey] || null) : null;
+  var countA = 0, countB = 0, votersA = [], votersB = [];
+
+  Object.keys(votes).forEach(function(k) {
+    var v = votes[k];
+    var name = (state.users[k] ? state.users[k].displayName : k);
+    if (v === 'a') { countA++; votersA.push(name); }
+    if (v === 'b') { countB++; votersB.push(name); }
+  });
+
+  var total = countA + countB;
+  var pct = total === 0 ? 50 : Math.round((countA / total) * 100);
+  var arrow = pct === 50 ? '=' : (pct > 50 ? String.fromCharCode(9658) : String.fromCharCode(9668));
+
+  var btnAClass = 'poll-btn' + (myVote === 'a' ? ' sel-a' : '');
+  var btnBClass = 'poll-btn' + (myVote === 'b' ? ' sel-b' : '');
+
+  var html = '<div class="poll-q">' + esc(pollSnap.question) + '</div>';
+  html += '<div class="poll-btns">';
+  html += '<button class="' + btnAClass + '" onclick="pollVote(\'a\')">' + esc(pollSnap.optA) + '</button>';
+  html += '<button class="' + btnBClass + '" onclick="pollVote(\'b\')">' + esc(pollSnap.optB) + '</button>';
+  html += '</div>';
+  html += '<div class="poll-bar-wrap">';
+  html += '<div class="poll-bar-labels"><span class="la">' + esc(pollSnap.optA) + ' (' + countA + ')</span><span class="lb">' + esc(pollSnap.optB) + ' (' + countB + ')</span></div>';
+  html += '<div class="poll-bar-track">';
+  html += '<div class="poll-bar-fill-a" style="width:' + pct + '%"></div>';
+  html += '<div class="poll-bar-fill-b" style="width:' + (100 - pct) + '%"></div>';
+  html += '<div class="poll-arrow" style="left:' + pct + '%">' + arrow + '</div>';
+  html += '</div></div>';
+
+  if (total === 0) {
+    html += '<div class="poll-empty">Ingen har stemt ennå!</div>';
+  } else {
+    html += '<div class="poll-voters">';
+    if (votersA.length) html += esc(pollSnap.optA) + ': ' + votersA.join(', ') + '<br>';
+    if (votersB.length) html += esc(pollSnap.optB) + ': ' + votersB.join(', ');
+    html += '</div>';
+  }
+
+  el.innerHTML = html;
+}
 
 // ── Tick ────────────────────────────────────────────────────
 setInterval(() => {
