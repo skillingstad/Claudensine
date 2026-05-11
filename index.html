@@ -327,7 +327,7 @@
 
     <!-- SHAME CORNER -->
     <div class="card" id="shame-section" style="display:none">
-      <div class="card-title">Skammekrok</div>
+      <div class="card-title">Kontekroken</div>
       <div class="tags" id="shame-now"></div>
       <!-- <div class="penalty-note">🚨 For å komme ut av skammekroken må man skrive: <strong>Jeg skal skjerpe meg</strong></div> -->
     </div>
@@ -672,8 +672,8 @@ window.togglePause = async function() {
 };
 
 function confirmShameExit(name) {
-  const answer = prompt(`${name} er i skammekroken. Hva er koden?:`);
-  if (answer === ' Hva') return true;
+  const answer = prompt(`${name} kontet estimering. Når skal du ta eksamen?:`);
+  if (answer === 'august') return true;
   if (answer !== null) toast('Feil tekst. Du blir værende i skammekroken.', 'e');
   return false;
 }
