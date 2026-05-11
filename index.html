@@ -331,7 +331,27 @@
       <div class="tags" id="shame-now"></div>
       <!-- <div class="penalty-note">🚨 For å komme ut av skammekroken må man skrive: <strong>Jeg skal skjerpe meg</strong></div> -->
     </div>
-
+    
+    <!-- POLL -->
+    <div class="card">
+      <div class="card-title">Dagens demokrati 🗳</div>
+      <div id="poll-display"><div class="poll-empty">Ingen avstemning ennå.</div></div>
+      <button class="poll-edit-toggle" onclick="pollToggleEdit()">✏ Sett spørsmål</button>
+      <div class="poll-edit-box" id="poll-edit-box">
+        <div class="row">
+          <input type="text" id="poll-q" placeholder="Spørsmålet..." maxlength="80">
+        </div>
+        <div class="row" style="display:flex;gap:10px">
+          <input type="text" id="poll-a" placeholder="Alternativ A" maxlength="40" style="flex:1">
+          <input type="text" id="poll-b" placeholder="Alternativ B" maxlength="40" style="flex:1">
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-yellow" onclick="pollSave()">Start</button>
+          <button class="poll-edit-toggle" onclick="pollToggleEdit()">Avbryt</button>
+        </div>
+      </div>
+    </div>
+    
     <!-- HIGHLIGHTS -->
     <div class="card">
       <div class="card-title">Dagens høydepunkter</div>
@@ -386,25 +406,7 @@
       </div>
     </div>
 
-    <!-- POLL -->
-    <div class="card">
-      <div class="card-title">Dagens demokrati 🗳</div>
-      <div id="poll-display"><div class="poll-empty">Ingen avstemning ennå.</div></div>
-      <button class="poll-edit-toggle" onclick="pollToggleEdit()">✏ Sett spørsmål</button>
-      <div class="poll-edit-box" id="poll-edit-box">
-        <div class="row">
-          <input type="text" id="poll-q" placeholder="Spørsmålet..." maxlength="80">
-        </div>
-        <div class="row" style="display:flex;gap:10px">
-          <input type="text" id="poll-a" placeholder="Alternativ A" maxlength="40" style="flex:1">
-          <input type="text" id="poll-b" placeholder="Alternativ B" maxlength="40" style="flex:1">
-        </div>
-        <div style="display:flex;gap:10px">
-          <button class="btn-yellow" onclick="pollSave()">Start</button>
-          <button class="poll-edit-toggle" onclick="pollToggleEdit()">Avbryt</button>
-        </div>
-      </div>
-    </div>
+
 
     <!-- COUNTERS -->
     <div class="card">
