@@ -756,9 +756,13 @@ function updateBtns() {
 function renderPresent() {
   const el = document.getElementById('present-now');
   const here = Object.values(state.users || {}).filter(u => u.active && !u.paused && !u.shamed);
-  el.innerHTML = here.length
-    ? here.map(u => `<span class="tag"><span class="pulse-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('')
-    : '<span class="muted">Ingen jobber akkurat nå.</span>';
+    var hereHtml = '';
+  here.forEach(function(u) {
+    hereHtml += '<span class="tag"><span class="pulse-dot"></span>' + esc(u.displayName);
+    if (u.status) hereHtml += ' — <span style="opacity:0.7;font-weight:400">' + esc(u.status) + '</span>';
+    hereHtml += '</span>';
+  });
+  el.innerHTML = hereHtml || '<span class="muted">Ingen jobber akkurat nå.</span>';
 
   // Pause section
   const onPause = Object.values(state.users || {}).filter(u => u.active && u.paused);
@@ -766,7 +770,13 @@ function renderPresent() {
   const pauseEl = document.getElementById('pause-now');
   if (onPause.length) {
     pauseSec.style.display = '';
-    pauseEl.innerHTML = onPause.map(u => `<span class="tag-pause"><span class="pause-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('');
+    var pauseHtml = '';
+    onPause.forEach(function(u) {
+      pauseHtml += '<span class="tag-pause"><span class="pause-dot"></span>' + esc(u.displayName);
+      if (u.status) pauseHtml += ' — <span style="opacity:0.7;font-weight:400">' + esc(u.status) + '</span>';
+      pauseHtml += '</span>';
+    });
+    pauseEl.innerHTML = pauseHtml;
   } else {
     pauseSec.style.display = 'none';
   }
@@ -777,7 +787,13 @@ function renderPresent() {
   const shameEl = document.getElementById('shame-now');
   if (inShame.length) {
     shameSec.style.display = '';
-    shameEl.innerHTML = inShame.map(u => `<span class="tag-shame"><span class="shame-dot"></span>${esc(u.displayName)}${u.status ? ` — <span style="opacity:0.7;font-weight:400">${esc(u.status)}</span>` : ''}</span>`).join('');
+    var shameHtml = '';
+    inShame.forEach(function(u) {
+      shameHtml += '<span class="tag-shame"><span class="shame-dot"></span>' + esc(u.displayName);
+      if (u.status) shameHtml += ' — <span style="opacity:0.7;font-weight:400">' + esc(u.status) + '</span>';
+      shameHtml += '</span>';
+    });
+    shameEl.innerHTML = shameHtml;
   } else {
     shameSec.style.display = 'none';
   }
@@ -963,8 +979,8 @@ function renderAdmin() {
     html += adminTimeCol('TOT', k, u.totalMs||0);
     html += adminTimeCol('UKE', k, u.weekMs||0);
     html += adminTimeCol('DAG', k, u.todayMs||0);
-    html += '<button class="btn-sm btn-save" onclick="saveAdmin('' + k + '')">Lagre</button>';
-    html += '<button class="btn-sm btn-del" onclick="deleteUser('' + k + '','' + esc(u.displayName) + '')">Slett</button>';
+    html += '<button class="btn-sm btn-save" onclick="saveAdmin(\'' + k + '\')">Lagre</button>';
+    html += '<button class="btn-sm btn-del" onclick="deleteUser(\'' + k + '\',\'' + esc(u.displayName) + '\')">Slett</button>';
     html += '</div>';
   });
   el.innerHTML = html;
