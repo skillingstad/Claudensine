@@ -855,7 +855,7 @@ function renderAllLBs() {
   }).filter(e => e.net > 0).sort((a,b) => b.net - a.net);
 
   const lbAll = document.getElementById('lb-alltime');
-  lbAll.innerHTML = allEntries.length ? allEntries.map(lbItem).join('') : emptyMsg();
+  lbAll.innerHTML = allEntries.length ? allEntries.slice(0, 20).map(lbItem).join('') : emptyMsg();
 }
 
 
