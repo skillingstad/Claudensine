@@ -226,8 +226,10 @@
 
   /* MINIGAME */
   .game-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-  .game-record { font-family: Space Mono,monospace; font-size: 11px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; color: var(--muted2); }
+  .game-record { font-family: Space Mono,monospace; font-size: 11px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; color: var(--muted2); min-width: 180px; }
   .game-record strong { color: var(--accent); }
+  .game-top3 { display: flex; flex-direction: column; gap: 3px; }
+  .game-top3-row { display: flex; gap: 6px; align-items: center; font-size: 10px; }
   .game-arena { display: flex; flex-direction: column; align-items: center; gap: 16px; }
   #reaction-btn {
     width: 100%; max-width: 480px; height: 140px; border-radius: 16px;
@@ -499,7 +501,7 @@ const firebaseConfig = {
   measurementId: "G-CMD346C44P"
 };
 
-let db, photos = {}, chatMsgs = [], pollSnap = null, gameRecord = null, state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
+let db, photos = {}, chatMsgs = [], pollSnap = null, gameRecords = [], state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
 
 try {
   const app = initializeApp(firebaseConfig);
@@ -547,8 +549,10 @@ function listen() {
     renderPhotos();
   });
 
-  onValue(ref(db, 'gameRecord'), function(snap) {
-    gameRecord = snap.val();
+  onValue(ref(db, 'gameRecords'), function(snap) {
+    gameRecords = [];
+    if (snap.exists()) snap.forEach(function(c){ gameRecords.push(c.val()); });
+    gameRecords.sort(function(a,b){ return a.ms - b.ms; });
     renderGameRecord();
   });
 
@@ -928,42 +932,42 @@ window.addCount = async function(keyOverride, type) {
   toast(`${emoji} ${u.displayName} — ${newVal} ${type === 'coffee' ? 'kaffe' : 'pils'}!`, 'i');
 };
 
+function adminTimeCol(prefix, k, ms) {
+  var h = Math.floor((ms||0)/3600000);
+  var m = Math.floor(((ms||0)%3600000)/60000);
+  return '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">'
+    + '<span style="font-size:9px;color:var(--muted2);letter-spacing:.1em;min-width:26px">' + prefix + '</span>'
+    + '<input type="number" id="' + prefix + '-h-' + k + '" class="admin-time-input" value="' + h + '" min="0" style="width:52px">'
+    + '<span style="font-size:11px;color:var(--muted2)">t</span>'
+    + '<input type="number" id="' + prefix + '-m-' + k + '" class="admin-time-input" value="' + m + '" min="0" max="59" style="width:52px">'
+    + '<span style="font-size:11px;color:var(--muted2)">m</span>'
+    + '</div>';
+}
+
 function renderAdmin() {
-  const el = document.getElementById('admin-list');
+  var el = document.getElementById('admin-list');
   if (!el) return;
-  const users = Object.entries(state.users || {});
-  if (!users.length) { el.innerHTML = '<div style="padding:16px;color:var(--muted2);font-family:Space Mono,monospace;font-size:12px">Ingen brukere ennå.</div>'; return; }
-
-  function hm(ms) {
-    const h = Math.floor((ms||0)/3600000);
-    const m = Math.floor(((ms||0)%3600000)/60000);
-    return { h, m };
+  var users = Object.entries(state.users || {});
+  if (!users.length) {
+    el.innerHTML = '<div style="padding:16px;color:var(--muted2);font-family:Space Mono,monospace;font-size:12px">Ingen brukere ennå.</div>';
+    return;
   }
-  function timeInputs(prefix, k, ms) {
-    const {h, m} = hm(ms);
-    return `
-      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
-        <span style="font-size:9px;color:var(--muted2);letter-spacing:.1em">${prefix}</span>
-        <input type="number" id="${prefix}-h-${k}" class="admin-time-input" value="${h}" min="0" style="width:52px">
-        <span style="font-size:11px;color:var(--muted2)">t</span>
-        <input type="number" id="${prefix}-m-${k}" class="admin-time-input" value="${m}" min="0" max="59" style="width:52px">
-        <span style="font-size:11px;color:var(--muted2)">m</span>
-      </div>`;
-  }
-
-  el.innerHTML = users
-    .sort((a,b) => (a[1].displayName||'').localeCompare(b[1].displayName||''))
-    .map(([k, u]) => `
-      <div class="admin-row" style="flex-wrap:wrap;gap:8px">
-        <div class="admin-name-col" style="min-width:100px;flex:1">
-          <input type="text" id="aname-${k}" value="${esc(u.displayName)}" maxlength="30" style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:Syne,sans-serif;font-weight:700;font-size:14px;padding:2px 4px;outline:none;">
-        </div>
-        ${timeInputs('TOT', k, u.totalMs||0)}
-        ${timeInputs('UKE', k, u.weekMs||0)}
-        ${timeInputs('DAG', k, u.todayMs||0)}
-        <button class="btn-sm btn-save" onclick="saveAdmin('${k}')">Lagre</button>
-        <button class="btn-sm btn-del" onclick="deleteUser('${k}','${esc(u.displayName)}')">Slett</button>
-      </div>`).join('');
+  var html = '';
+  users.sort(function(a,b){ return (a[1].displayName||'').localeCompare(b[1].displayName||''); });
+  users.forEach(function(entry) {
+    var k = entry[0], u = entry[1];
+    html += '<div class="admin-row" style="flex-wrap:wrap;gap:8px">';
+    html += '<div class="admin-name-col" style="min-width:100px;flex:1">';
+    html += '<input type="text" id="aname-' + k + '" value="' + esc(u.displayName) + '" maxlength="30" style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:Syne,sans-serif;font-weight:700;font-size:14px;padding:2px 4px;outline:none;">';
+    html += '</div>';
+    html += adminTimeCol('TOT', k, u.totalMs||0);
+    html += adminTimeCol('UKE', k, u.weekMs||0);
+    html += adminTimeCol('DAG', k, u.todayMs||0);
+    html += '<button class="btn-sm btn-save" onclick="saveAdmin('' + k + '')">Lagre</button>';
+    html += '<button class="btn-sm btn-del" onclick="deleteUser('' + k + '','' + esc(u.displayName) + '')">Slett</button>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
 }
 
 window.saveAdmin = async function(k) {
@@ -1226,16 +1230,17 @@ checkExamBanner();
 
 
 // ── Reaction game ─────────────────────────────────────────────
-var reactionState = 'idle'; // idle | waiting | go | done
+var reactionState = 'idle';
 var reactionTimer = null;
 var reactionStart = null;
+var GAME_DATE_KEY = 'gameDate';
+var medals = ['🥇','🥈','🥉'];
 
 window.reactionClick = function() {
   var btn = document.getElementById('reaction-btn');
   var res = document.getElementById('game-result');
 
   if (reactionState === 'idle' || reactionState === 'done') {
-    // Start — wait random 1.5–5s then go green
     reactionState = 'waiting';
     btn.className = 'waiting';
     btn.textContent = 'Vent på grønt...';
@@ -1249,7 +1254,6 @@ window.reactionClick = function() {
     }, delay);
 
   } else if (reactionState === 'waiting') {
-    // Too soon!
     clearTimeout(reactionTimer);
     reactionState = 'done';
     btn.className = 'toosoon';
@@ -1257,37 +1261,76 @@ window.reactionClick = function() {
     res.innerHTML = '⚠ Du trykket for tidlig!';
 
   } else if (reactionState === 'go') {
-    // Measure time
     var ms = Date.now() - reactionStart;
     reactionState = 'done';
     btn.className = 'result';
     btn.textContent = 'Prøv igjen';
+
+    if (ms < 100) {
+      res.innerHTML = 'Din tid: <strong>' + ms + ' ms</strong> — for raskt, teller ikke! 🤖';
+      return;
+    }
+
     res.innerHTML = 'Din tid: <strong>' + ms + ' ms</strong>';
 
-    // Check if new record
     var k = sel();
     if (!k || !state.users[k]) {
-      res.innerHTML += '<br><span style="color:var(--accent3);font-size:10px">Velg deg selv for å lagre rekorden!</span>';
+      res.innerHTML += '<br><span style="color:var(--accent3);font-size:10px">Velg deg selv for å lagre!</span>';
       return;
     }
     var name = state.users[k].displayName;
-    if (!gameRecord || ms < gameRecord.ms) {
-      set(ref(db, 'gameRecord'), { name: name, ms: ms, uid: k });
-      res.innerHTML += '<br><strong style="color:var(--accent)">🏆 NY REKORD!</strong>';
-    } else {
-      res.innerHTML += '<br><span style="color:var(--muted2);font-size:10px">Rekord: ' + gameRecord.ms + ' ms (' + esc(gameRecord.name) + ')</span>';
+    var today = localDateStr();
+
+    // Check if already in top3 with better score
+    var myBest = null;
+    gameRecords.forEach(function(r) { if (r.uid === k && (myBest === null || r.ms < myBest)) myBest = r.ms; });
+
+    if (myBest !== null && ms >= myBest) {
+      res.innerHTML += '<br><span style="color:var(--muted2);font-size:10px">Din beste er ' + myBest + ' ms — ikke bedre denne gang.</span>';
+      return;
     }
+
+    // Save as new entry, reset daily if new day
+    var dateNode = gameRecords.length > 0 ? (gameRecords[0].date || '') : '';
+    var updates = {};
+    if (dateNode !== today) {
+      // New day — wipe records
+      updates['gameRecords'] = null;
+      set(ref(db, 'gameRecords'), null).then(function() {
+        push(ref(db, 'gameRecords'), { name: name, ms: ms, uid: k, date: today });
+      });
+    } else {
+      push(ref(db, 'gameRecords'), { name: name, ms: ms, uid: k, date: today });
+    }
+    res.innerHTML += '<br><strong style="color:var(--accent)">🏆 Lagret!</strong>';
   }
 };
 
 function renderGameRecord() {
   var el = document.getElementById('game-record');
   if (!el) return;
-  if (!gameRecord) {
-    el.innerHTML = 'Rekord: ingen ennå';
-  } else {
-    el.innerHTML = '⚡ Rekord: <strong>' + gameRecord.ms + ' ms</strong> — ' + esc(gameRecord.name);
+
+  // Check if records are from today, if not show empty
+  var today = localDateStr();
+  var todayRecords = gameRecords.filter(function(r) { return r.date === today; });
+
+  // Get best per person
+  var best = {};
+  todayRecords.forEach(function(r) {
+    if (!best[r.uid] || r.ms < best[r.uid].ms) best[r.uid] = r;
+  });
+  var top3 = Object.values(best).sort(function(a,b){ return a.ms - b.ms; }).slice(0,3);
+
+  if (!top3.length) {
+    el.innerHTML = 'Ingen rekorder i dag';
+    return;
   }
+  var html = '<div class="game-top3">';
+  top3.forEach(function(r, i) {
+    html += '<div class="game-top3-row">' + medals[i] + ' <strong>' + r.ms + ' ms</strong> — ' + esc(r.name) + '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
 }
 
 // ── Poll ─────────────────────────────────────────────────────
