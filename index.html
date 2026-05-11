@@ -703,8 +703,8 @@ window.togglePause = async function() {
 };
 
 function confirmShameExit(name) {
-  const answer = prompt(`${name} er i skammekroken. Skriv inn koden:`);
-  if (answer === 'koden') return true;
+  const answer = prompt(`${name} er i skammekroken. Hva er koden?:`);
+  if (answer === ' Hva') return true;
   if (answer !== null) toast('Feil tekst. Du blir værende i skammekroken.', 'e');
   return false;
 }
