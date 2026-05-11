@@ -256,6 +256,25 @@
   .poll-edit-box { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
   .poll-edit-box.open { display: block; }
   .poll-edit-box .row { margin-bottom: 10px; }
+
+  /* MINIGAME */
+  .game-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+  .game-record { font-family: Space Mono,monospace; font-size: 11px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; color: var(--muted2); }
+  .game-record strong { color: var(--accent); }
+  .game-arena { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  #reaction-btn {
+    width: 100%; max-width: 480px; height: 140px; border-radius: 16px;
+    border: none; cursor: pointer; font-family: Syne,sans-serif; font-weight: 800;
+    font-size: 22px; letter-spacing: 0.02em; transition: transform 0.1s;
+    background: var(--surface2); color: var(--muted2); border: 2px solid var(--border);
+  }
+  #reaction-btn:active { transform: scale(0.97); }
+  #reaction-btn.waiting { background: var(--accent3); color: #fff; border-color: var(--accent3); cursor: default; }
+  #reaction-btn.go { background: var(--accent2); color: #0a0a0f; border-color: var(--accent2); cursor: pointer; }
+  #reaction-btn.result { background: var(--accent); color: #0a0a0f; border-color: var(--accent); }
+  #reaction-btn.toosoon { background: var(--accent3); color: #fff; border-color: var(--accent3); }
+  .game-result { font-family: Space Mono,monospace; font-size: 13px; color: var(--muted2); text-align: center; min-height: 20px; }
+  .game-result strong { color: var(--text); font-size: 16px; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
@@ -346,26 +365,6 @@
       <!-- <div class="penalty-note">🚨 For å komme ut av skammekroken må man skrive: <strong>Jeg skal skjerpe meg</strong></div> -->
     </div>
 
-        <!-- POLL -->
-    <div class="card">
-      <div class="card-title">Dagens demokrati </div>
-      <div id="poll-display"><div class="poll-empty">Ingen avstemning ennå.</div></div>
-      <button class="poll-edit-toggle" onclick="pollToggleEdit()">✏ Sett spørsmål</button>
-      <div class="poll-edit-box" id="poll-edit-box">
-        <div class="row">
-          <input type="text" id="poll-q" placeholder="Spørsmålet..." maxlength="80">
-        </div>
-        <div class="row" style="display:flex;gap:10px">
-          <input type="text" id="poll-a" placeholder="Alternativ A" maxlength="40" style="flex:1">
-          <input type="text" id="poll-b" placeholder="Alternativ B" maxlength="40" style="flex:1">
-        </div>
-        <div style="display:flex;gap:10px">
-          <button class="btn-yellow" onclick="pollSave()">Start</button>
-          <button class="poll-edit-toggle" onclick="pollToggleEdit()">Avbryt</button>
-        </div>
-      </div>
-    </div>
-
     <!-- HIGHLIGHTS -->
     <div class="card">
       <div class="card-title">Dagens høydepunkter</div>
@@ -407,7 +406,38 @@
       </div>
     </div>
 
+    <!-- MINIGAME -->
+    <div class="card">
+      <div class="card-title">Reaksjonstest ⚡</div>
+      <div class="game-header">
+        <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted2)">Trykk knappen så fort du kan når den blir grønn. Velg deg selv ovenfor.</div>
+        <div class="game-record" id="game-record">Rekord: ingen ennå</div>
+      </div>
+      <div class="game-arena">
+        <button id="reaction-btn" onclick="reactionClick()">Trykk for å starte</button>
+        <div class="game-result" id="game-result"></div>
+      </div>
+    </div>
 
+    <!-- POLL -->
+    <div class="card">
+      <div class="card-title">Dagens demokrati 🗳</div>
+      <div id="poll-display"><div class="poll-empty">Ingen avstemning ennå.</div></div>
+      <button class="poll-edit-toggle" onclick="pollToggleEdit()">✏ Sett spørsmål</button>
+      <div class="poll-edit-box" id="poll-edit-box">
+        <div class="row">
+          <input type="text" id="poll-q" placeholder="Spørsmålet..." maxlength="80">
+        </div>
+        <div class="row" style="display:flex;gap:10px">
+          <input type="text" id="poll-a" placeholder="Alternativ A" maxlength="40" style="flex:1">
+          <input type="text" id="poll-b" placeholder="Alternativ B" maxlength="40" style="flex:1">
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-yellow" onclick="pollSave()">Start</button>
+          <button class="poll-edit-toggle" onclick="pollToggleEdit()">Avbryt</button>
+        </div>
+      </div>
+    </div>
 
     <!-- COUNTERS -->
     <div class="card">
@@ -470,12 +500,12 @@
     </div>
 -->
     <!-- ADMIN -->
-    <!--
+    
     <div class="card">
       <div class="card-title">⚙ Administrer brukere</div>
       <div id="admin-list"></div>
     </div>
-    -->
+  
 
   </div>
 
@@ -500,7 +530,7 @@ const firebaseConfig = {
   measurementId: "G-CMD346C44P"
 };
 
-let db, photos = {}, chatMsgs = [], pollSnap = null, state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
+let db, photos = {}, chatMsgs = [], pollSnap = null, gameRecord = null, state = { users: {}, today: null, firstIn: null, lastIn: null, lastOut: null };
 
 try {
   const app = initializeApp(firebaseConfig);
@@ -546,6 +576,11 @@ function listen() {
   onValue(ref(db, 'photos'), snap => {
     photos = snap.val() || {};
     renderPhotos();
+  });
+
+  onValue(ref(db, 'gameRecord'), function(snap) {
+    gameRecord = snap.val();
+    renderGameRecord();
   });
 
   onValue(ref(db, 'poll'), function(snap) {
@@ -669,7 +704,7 @@ window.togglePause = async function() {
 
 function confirmShameExit(name) {
   const answer = prompt(`${name} er i skammekroken. Skriv inn koden:`);
-  if (answer === ' inn koden:') return true;
+  if (answer === 'koden') return true;
   if (answer !== null) toast('Feil tekst. Du blir værende i skammekroken.', 'e');
   return false;
 }
@@ -1014,6 +1049,75 @@ window.saveQuote = async function() {
   toast(text ? '💬 Quote oppdatert!' : 'Quote fjernet.', 'i');
 };
 
+
+// ── Photos ────────────────────────────────────────────────────
+/*
+window.addPhoto = async function() {
+  const urlEl = document.getElementById('photo-url');
+  const capEl = document.getElementById('photo-cap');
+  const url = urlEl.value.trim();
+  if (!url) { toast('Lim inn en bilde-URL først.', 'e'); return; }
+  if (!/^https?:\/\//i.test(url)) { toast('URL må starte med http:// eller https://', 'e'); return; }
+  const k = sel();
+  const addedBy = k && state.users[k] ? state.users[k].displayName : 'Anonym';
+  urlEl.disabled = true;
+  try {
+    await push(ref(db, 'photos'), {
+      url,
+      caption: capEl.value.trim() || null,
+      addedBy,
+      ts: Date.now()
+    });
+    urlEl.value = '';
+    capEl.value = '';
+    toast('📸 Bilde lagt til!', 'i');
+  } catch(e) {
+    toast('Feil: ' + e.message, 'e');
+  } finally {
+    urlEl.disabled = false;
+  }
+};
+
+window.deletePhoto = async function(k) {
+  if (!confirm('Slette dette bildet?')) return;
+  await set(ref(db, 'photos/' + k), null);
+  toast('Bilde slettet.', 'e');
+};
+
+window.openLightbox = function(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+window.closeLightbox = function() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightbox-img').src = '';
+  document.body.style.overflow = '';
+};
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+function renderPhotos() {
+  const el = document.getElementById('photo-grid');
+  if (!el) return;
+  const entries = Object.entries(photos).sort((a, b) => (b[1].ts || 0) - (a[1].ts || 0));
+  if (!entries.length) {
+    el.innerHTML = '<div class="muted">Ingen bilder ennå — vær den første! 📸</div>';
+    return;
+  }
+  let html = '';
+  entries.forEach(([k, p]) => {
+    const safeUrl = p.url.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const label = esc(p.caption || p.addedBy || '');
+    html += '<div class="photo-item" onclick="openLightbox('' + safeUrl + '')">'
+      + '<img src="' + safeUrl + '" alt="' + esc(p.caption || '') + '" loading="lazy" onerror="this.parentElement.style.display='none'">'
+      + (label ? '<div class="photo-meta">' + label + '</div>' : '')
+      + '<button class="photo-del" onclick="event.stopPropagation();deletePhoto('' + k + '')" title="Slett">✕</button>'
+      + '</div>';
+  });
+  el.innerHTML = html;
+}
+
+*/
 // ── Chat ─────────────────────────────────────────────────────
 window.chatSend = async function() {
   const inp = document.getElementById('chat-inp');
@@ -1150,6 +1254,72 @@ function daysUntil(iso) {
 checkExamBanner();
 
 
+
+
+// ── Reaction game ─────────────────────────────────────────────
+var reactionState = 'idle'; // idle | waiting | go | done
+var reactionTimer = null;
+var reactionStart = null;
+
+window.reactionClick = function() {
+  var btn = document.getElementById('reaction-btn');
+  var res = document.getElementById('game-result');
+
+  if (reactionState === 'idle' || reactionState === 'done') {
+    // Start — wait random 1.5–5s then go green
+    reactionState = 'waiting';
+    btn.className = 'waiting';
+    btn.textContent = 'Vent på grønt...';
+    res.innerHTML = '';
+    var delay = 1500 + Math.random() * 3500;
+    reactionTimer = setTimeout(function() {
+      reactionState = 'go';
+      btn.className = 'go';
+      btn.textContent = 'TRYKK NÅ!';
+      reactionStart = Date.now();
+    }, delay);
+
+  } else if (reactionState === 'waiting') {
+    // Too soon!
+    clearTimeout(reactionTimer);
+    reactionState = 'done';
+    btn.className = 'toosoon';
+    btn.textContent = 'For tidlig! Prøv igjen';
+    res.innerHTML = '⚠ Du trykket for tidlig!';
+
+  } else if (reactionState === 'go') {
+    // Measure time
+    var ms = Date.now() - reactionStart;
+    reactionState = 'done';
+    btn.className = 'result';
+    btn.textContent = 'Trykk for å prøve igjen';
+    res.innerHTML = 'Din tid: <strong>' + ms + ' ms</strong>';
+
+    // Check if new record
+    var k = sel();
+    if (!k || !state.users[k]) {
+      res.innerHTML += '<br><span style="color:var(--accent3);font-size:10px">Velg deg selv for å lagre rekorden!</span>';
+      return;
+    }
+    var name = state.users[k].displayName;
+    if (!gameRecord || ms < gameRecord.ms) {
+      set(ref(db, 'gameRecord'), { name: name, ms: ms, uid: k });
+      res.innerHTML += '<br><strong style="color:var(--accent)">🏆 NY REKORD!</strong>';
+    } else {
+      res.innerHTML += '<br><span style="color:var(--muted2);font-size:10px">Rekord: ' + gameRecord.ms + ' ms (' + esc(gameRecord.name) + ')</span>';
+    }
+  }
+};
+
+function renderGameRecord() {
+  var el = document.getElementById('game-record');
+  if (!el) return;
+  if (!gameRecord) {
+    el.innerHTML = 'Rekord: ingen ennå';
+  } else {
+    el.innerHTML = '⚡ Rekord: <strong>' + gameRecord.ms + ' ms</strong> — ' + esc(gameRecord.name);
+  }
+}
 
 // ── Poll ─────────────────────────────────────────────────────
 window.pollToggleEdit = function() {
