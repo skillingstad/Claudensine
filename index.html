@@ -440,33 +440,6 @@
       </div>
     </div>
     
-    <!-- PHOTO WALL -->
-    <!--
-    <div class="card">
-      <div class="card-title">Bildevegg 📸</div>
-      <div class="photo-add-row">
-        <input type="text" id="photo-url" placeholder="Lim inn bilde-URL (imgur, discord, etc.)" style="flex:2;min-width:200px">
-        <input type="text" id="photo-cap" placeholder="Bildetekst (valgfritt)" style="flex:1;min-width:130px">
-        <button class="btn-yellow" onclick="addPhoto()">+ Legg til</button>
-      </div>
-      <div class="photo-grid" id="photo-grid">
-        <div class="muted">Ingen bilder ennå — vær den første! 📸</div>
-      </div>
-    </div>
--->
-    <!-- CHAT -->
-    <!--
-    <div class="card">
-      <div class="card-title">Chat 💬</div>
-      <div class="chat-box">
-        <div class="chat-log" id="chat-log"></div>
-        <div class="chat-send-row">
-          <input type="text" id="chat-inp" placeholder="Skriv en melding... (velg deg selv ovenfor)" maxlength="200">
-          <button class="btn-cyan" id="chat-btn" onclick="chatSend()">Send</button>
-        </div>
-      </div>
-    </div>
--->
     <!-- ADMIN -->
     
     <div class="card">
@@ -872,7 +845,7 @@ function renderAllLBs() {
   }).filter(e => e.net > 0).sort((a,b) => b.net - a.net);
 
   const lbAll = document.getElementById('lb-alltime');
-  lbAll.innerHTML = allEntries.length ? allEntries.slice(0, 20).map(lbItem).join('') : emptyMsg();
+  lbAll.innerHTML = allEntries.length ? allEntries.slice(0, 15).map(lbItem).join('') : emptyMsg();
 }
 
 
