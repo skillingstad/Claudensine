@@ -126,9 +126,6 @@
   .toast.e { border-left-color: var(--accent3); } .toast.i { border-left-color: var(--accent2); }
   footer { text-align: center; padding: 48px 0 32px; color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.15em; border-top: 1px solid var(--border); margin-top: 8px; }
 
-
-  
-
   /* ADMIN */
   .admin-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; flex-wrap: wrap; }
   .admin-name-col { font-weight: 700; min-width: 120px; flex: 1; }
@@ -329,7 +326,7 @@
 
     <!-- SHAME CORNER -->
     <div class="card" id="shame-section" style="display:none">
-      <div class="card-title">Kontekroken</div>
+      <div class="card-title">Kosekroken</div>
       <div class="tags" id="shame-now"></div>
       <!-- <div class="penalty-note">🚨 For å komme ut av skammekroken må man skrive: <strong>Jeg skal skjerpe meg</strong></div> -->
     </div>
@@ -676,8 +673,8 @@ window.togglePause = async function() {
 };
 
 function confirmShameExit(name) {
-  const answer = prompt(`${name} kontet. Når blir du ferdig med tredjeklasse?`);
-  if (answer === 'august') return true;
+  const answer = prompt(`${name} er i kosekroken <3 er ikke det hyggelig?`);
+  if (answer === 'jo') return true;
   if (answer !== null) toast('Feil tekst. Du blir værende i skammekroken.', 'e');
   return false;
 }
