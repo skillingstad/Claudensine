@@ -837,7 +837,7 @@ function renderAllLBs() {
   }).filter(e => e.net > 0).sort((a,b) => b.net - a.net);
 
   const lbWeek = document.getElementById('lb-week');
-  lbWeek.innerHTML = weekEntries.length ? weekEntries.map(lbItem).join('') : emptyMsg();
+  lbWeek.innerHTML = weekEntries.length ? weekEntries.slice(0,15).map(lbItem).join('') : emptyMsg();
 
   // ALL TIME
   const allEntries = users.map(u => {
