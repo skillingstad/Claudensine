@@ -333,7 +333,7 @@
     
     <!-- POLL -->
     <div class="card">
-      <div class="card-title">Dagens demokrati 🗳</div>
+      <div class="card-title">Dagens demokrati </div>
       <div id="poll-display"><div class="poll-empty">Ingen avstemning ennå.</div></div>
       <button class="poll-edit-toggle" onclick="pollToggleEdit()">✏ Sett spørsmål</button>
       <div class="poll-edit-box" id="poll-edit-box">
@@ -647,9 +647,9 @@ window.togglePause = async function() {
 };
 
 function confirmShameExit(name) {
-  const answer = prompt(`${name} er i kosekroken <3 er ikke det hyggelig?`);
-  if (answer === 'jo') return true;
-  if (answer !== null) toast('Feil tekst. Du blir værende i skammekroken.', 'e');
+  const answer = prompt(`${name} er i kosekroken <3 Hva kan passordet være?`);
+  if (answer === ' Hva') return true;
+  if (answer !== null) toast('Feil tekst. Du blir værende i kroken.', 'e');
   return false;
 }
 
