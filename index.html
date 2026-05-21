@@ -326,7 +326,7 @@
 
     <!-- SHAME CORNER -->
     <div class="card" id="shame-section" style="display:none">
-      <div class="card-title">Kosekroken</div>
+      <div class="card-title">Dørkroken</div>
       <div class="tags" id="shame-now"></div>
       <!-- <div class="penalty-note">🚨 For å komme ut av skammekroken må man skrive: <strong>Jeg skal skjerpe meg</strong></div> -->
     </div>
@@ -647,7 +647,7 @@ window.togglePause = async function() {
 };
 
 function confirmShameExit(name) {
-  const answer = prompt(`${name} er i kosekroken <3 Hva kan passordet være?`);
+  const answer = prompt(`${name} er i dørkroken. Hva er det magiske ordet`);
   if (answer === ' Hva') return true;
   if (answer !== null) toast('Feil tekst. Du blir værende i kroken.', 'e');
   return false;
@@ -716,7 +716,7 @@ function updateBtns() {
 
   const shameBtn = document.getElementById('btn-shame');
   if (isShamed) {
-    shameBtn.textContent = 'Ut av kosekroken';
+    shameBtn.textContent = 'Ut av dørkroken';
     shameBtn.classList.add('active-shame');
   } else {
     shameBtn.textContent = 'Kosekrok';
