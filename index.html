@@ -647,8 +647,8 @@ window.togglePause = async function() {
 };
 
 function confirmShameExit(name) {
-  const answer = prompt(`${name} er i skammekroken. Hva er det magiske ordet`);
-  if (answer === ' Hva') return true;
+  const answer = prompt(`${name} er i skammekroken. Hva er det som mangler på koldtbordet?`);
+  if (answer === 'kabaret') return true;
   if (answer !== null) toast('Feil tekst. Du blir værende i kroken.', 'e');
   return false;
 }
